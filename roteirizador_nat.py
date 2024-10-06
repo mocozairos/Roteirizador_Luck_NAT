@@ -64,11 +64,12 @@ def puxar_sequencias_hoteis():
     client = gspread.authorize(credentials)
 
     # Abrir a planilha desejada pelo seu ID
-    spreadsheet = client.open_by_key('1kKYpLIe7GJ9W277D9zVJP_3_VS2FDB-8vHvJSjUGiGE')
+    spreadsheet = client.open_by_key('1MFQLhzOB55Amyz9qkqSB4IuajdXkYreW')
 
-    lista_abas = ['Hoteis Joao Pessoa', 'Hoteis Pitimbu', 'Hoteis Campina Grande']
+    lista_abas = ['Hoteis Natal', 'Hoteis Pipa', 'Hoteis Touros', 'Hoteis Sao Miguel', 'Hoteis Galinhos', 'Hoteis Camurupim', 'Hoteis Genipabu', 'Hoteis Pirangi', 
+                  'Hoteis Baia Formosa']
 
-    lista_df_hoteis = ['df_joao_pessoa', 'df_pitimbu', 'df_campina_grande']
+    lista_df_hoteis = ['df_natal', 'df_pipa', 'df_touros', 'df_sao_miguel', 'df_galinhos', 'df_camurupim', 'df_genipabu', 'df_pirangi', 'df_baia_formosa']
 
     for index in range(len(lista_abas)):
 
@@ -110,7 +111,7 @@ def inserir_hoteis_faltantes(itens_faltantes, df_hoteis, aba_excel, regiao):
     credentials = credentials.with_scopes(scope)
     client = gspread.authorize(credentials)
     
-    spreadsheet = client.open_by_key('1kKYpLIe7GJ9W277D9zVJP_3_VS2FDB-8vHvJSjUGiGE')
+    spreadsheet = client.open_by_key('1MFQLhzOB55Amyz9qkqSB4IuajdXkYreW')
 
     sheet = spreadsheet.worksheet(aba_excel)
     sheet_data = sheet.get_all_values()
@@ -206,8 +207,8 @@ def criar_df_servicos_2(df_servicos, df_juncao_voos, df_hoteis):
 
     return df_servicos_2
 
-def definir_horario_primeiro_hotel(df, index, intervalo_inicial_joao_pessoa, intervalo_inicial_pitimbu, intervalo_inicial_recife, 
-                                   intervalo_inicial_campina_grande):
+def definir_horario_primeiro_hotel(df, index, intervalo_inicial_natal, intervalo_inicial_pipa, intervalo_inicial_sao_miguel, intervalo_inicial_galinhos, 
+                                   intervalo_inicial_camurupim):
 
     servico = df.at[index, 'Servico']
 
@@ -235,22 +236,25 @@ def definir_horario_primeiro_hotel(df, index, intervalo_inicial_joao_pessoa, int
 
     data_hora_voo = pd.to_datetime(data_hora_voo_str, format='%Y-%m-%d %H:%M:%S')
 
-    if servico=='HOTÉIS JOÃO PESSOA / AEROPORTO JOÃO PESSOA':
+    if servico=='OUT - Natal' or servico=='Out - Genipabu':
 
-        return data_hora_voo - intervalo_inicial_joao_pessoa
+        return data_hora_voo - intervalo_inicial_natal
+    
+    elif servico=='OUT - Pipa' or servico=='OUT - Touros':
 
-    elif servico=='HOTÉIS PITIMBU / AEROPORTO JOÃO PESSOA':
+        return data_hora_voo - intervalo_inicial_pipa
+    
+    elif servico=='OUT - São Miguel Gostoso' or servico=='OUT - Baia Formosa':
 
-        return data_hora_voo - intervalo_inicial_pitimbu
+        return data_hora_voo - intervalo_inicial_sao_miguel
+    
+    elif servico=='Out - Galinhos':
 
-    elif servico == 'HOTÉIS CAMPINA GRANDE / AEROPORTO JOÃO PESSOA' or servico=='HOTÉIS JOÃO PESSOA / AEROPORTO RECIFE' or \
-        servico=='HOTÉIS PITIMBU / AEROPORTO RECIFE':
+        return data_hora_voo - intervalo_inicial_galinhos
+    
+    elif servico=='OUT - Camurupim' or servico=='OUT - Pirangi':
 
-        return data_hora_voo - intervalo_inicial_recife
-
-    elif servico=='HOTEL CAMPINA GRANDE / AEROPORTO CAMPINA GRANDE':
-
-        return data_hora_voo - intervalo_inicial_campina_grande
+        return data_hora_voo - intervalo_inicial_camurupim
 
 def roteirizar_hoteis_mais_pax_max(df_servicos, roteiro, df_hoteis_pax_max):
 
@@ -381,8 +385,8 @@ def roteirizar_hoteis_mais_pax_max(df_servicos, roteiro, df_hoteis_pax_max):
     for index in range(len(df_hoteis_pax_max)):
 
         df_hoteis_pax_max.at[index, 'Data Horario Apresentacao'] = \
-            definir_horario_primeiro_hotel(df_hoteis_pax_max, index, intervalo_inicial_joao_pessoa, intervalo_inicial_pitimbu, intervalo_inicial_recife, 
-                                   intervalo_inicial_campina_grande)
+            definir_horario_primeiro_hotel(df_hoteis_pax_max, index, intervalo_inicial_natal, intervalo_inicial_pipa, intervalo_inicial_sao_miguel, 
+                                           intervalo_inicial_galinhos, intervalo_inicial_camurupim)
 
     df_servicos = df_servicos.reset_index(drop=True)
 
@@ -514,8 +518,8 @@ def roteirizar_voo_juncao_mais_pax_max(df_servicos, roteiro, max_hoteis, pax_max
                             if index==0:
 
                                 df_ref_2_group.at[index, 'Data Horario Apresentacao'] = \
-                                    definir_horario_primeiro_hotel(df_ref_2_group, index, intervalo_inicial_joao_pessoa, intervalo_inicial_pitimbu, intervalo_inicial_recife, 
-                                   intervalo_inicial_campina_grande)
+                                    definir_horario_primeiro_hotel(df_ref_2_group, index, intervalo_inicial_natal, intervalo_inicial_pipa, 
+                                                                   intervalo_inicial_sao_miguel, intervalo_inicial_galinhos, intervalo_inicial_camurupim)
 
                             else:
 
@@ -583,8 +587,8 @@ def roteirizar_voo_juncao_mais_pax_max(df_servicos, roteiro, max_hoteis, pax_max
                             if index==0:
 
                                 df_ref_2_group.at[index, 'Data Horario Apresentacao'] = \
-                                    definir_horario_primeiro_hotel(df_ref_2_group, index, intervalo_inicial_joao_pessoa, intervalo_inicial_pitimbu, intervalo_inicial_recife, 
-                                   intervalo_inicial_campina_grande)
+                                    definir_horario_primeiro_hotel(df_ref_2_group, index, intervalo_inicial_natal, intervalo_inicial_pipa, 
+                                                                   intervalo_inicial_sao_miguel, intervalo_inicial_galinhos, intervalo_inicial_camurupim)
 
                             else:
 
@@ -638,8 +642,8 @@ def roteirizar_privativos(roteiro, df_servicos, index):
     roteiro+=1
 
     df_servicos.at[index, 'Data Horario Apresentacao'] = \
-        definir_horario_primeiro_hotel(df_servicos, index, intervalo_inicial_joao_pessoa, intervalo_inicial_pitimbu, intervalo_inicial_recife, 
-                                   intervalo_inicial_campina_grande)
+        definir_horario_primeiro_hotel(df_servicos, index, intervalo_inicial_natal, intervalo_inicial_pipa, intervalo_inicial_sao_miguel, 
+                                       intervalo_inicial_galinhos, intervalo_inicial_camurupim)
     
     df_servicos.at[index, 'Roteiro'] = roteiro
     
@@ -660,8 +664,8 @@ def abrir_novo_carro(carros, roteiro, df_servicos, value, index, paxs_hotel):
     carros+=1
 
     df_servicos.at[value, 'Data Horario Apresentacao'] = \
-        definir_horario_primeiro_hotel(df_servicos, index, intervalo_inicial_joao_pessoa, intervalo_inicial_pitimbu, intervalo_inicial_recife, 
-                                   intervalo_inicial_campina_grande)
+        definir_horario_primeiro_hotel(df_servicos, index, intervalo_inicial_natal, intervalo_inicial_pipa, intervalo_inicial_sao_miguel, 
+                                       intervalo_inicial_galinhos, intervalo_inicial_camurupim)
 
     data_horario_primeiro_hotel = df_servicos.at[value, 'Data Horario Apresentacao']
 
@@ -729,8 +733,8 @@ def gerar_horarios_apresentacao(df_servicos, roteiro, max_hoteis):
                             if value==index_inicial:
 
                                 df_servicos.at[value, 'Data Horario Apresentacao'] = \
-                                    definir_horario_primeiro_hotel(df_servicos, value, intervalo_inicial_joao_pessoa, intervalo_inicial_pitimbu, intervalo_inicial_recife, 
-                                   intervalo_inicial_campina_grande)
+                                    definir_horario_primeiro_hotel(df_servicos, value, intervalo_inicial_natal, intervalo_inicial_pipa, intervalo_inicial_sao_miguel, 
+                                           intervalo_inicial_galinhos, intervalo_inicial_camurupim)
                                 
                                 data_horario_primeiro_hotel = df_servicos.at[value, 'Data Horario Apresentacao']
                                 
@@ -829,8 +833,8 @@ def gerar_horarios_apresentacao(df_servicos, roteiro, max_hoteis):
                             if value==index_inicial:
 
                                 df_servicos.at[value, 'Data Horario Apresentacao'] = \
-                                    definir_horario_primeiro_hotel(df_servicos, value, intervalo_inicial_joao_pessoa, intervalo_inicial_pitimbu, intervalo_inicial_recife, 
-                                   intervalo_inicial_campina_grande)
+                                    definir_horario_primeiro_hotel(df_servicos, value, intervalo_inicial_natal, intervalo_inicial_pipa, intervalo_inicial_sao_miguel, 
+                                           intervalo_inicial_galinhos, intervalo_inicial_camurupim)
                                 
                                 data_horario_primeiro_hotel = df_servicos.at[value, 'Data Horario Apresentacao']
                                 
@@ -953,8 +957,8 @@ def gerar_horarios_apresentacao(df_servicos, roteiro, max_hoteis):
                             if value==index_inicial:
 
                                 df_servicos.at[value, 'Data Horario Apresentacao']=\
-                                    definir_horario_primeiro_hotel(df_servicos, value, intervalo_inicial_joao_pessoa, intervalo_inicial_pitimbu, intervalo_inicial_recife, 
-                                   intervalo_inicial_campina_grande)
+                                    definir_horario_primeiro_hotel(df_servicos, value, intervalo_inicial_natal, intervalo_inicial_pipa, intervalo_inicial_sao_miguel, 
+                                           intervalo_inicial_galinhos, intervalo_inicial_camurupim)
                                 
                                 data_horario_primeiro_hotel = df_servicos.at[value, 'Data Horario Apresentacao']
                                 
@@ -1049,8 +1053,8 @@ def gerar_horarios_apresentacao(df_servicos, roteiro, max_hoteis):
                             if value==index_inicial:
 
                                 df_servicos.at[value, 'Data Horario Apresentacao']=\
-                                    definir_horario_primeiro_hotel(df_servicos, value, intervalo_inicial_joao_pessoa, intervalo_inicial_pitimbu, intervalo_inicial_recife, 
-                                   intervalo_inicial_campina_grande)
+                                    definir_horario_primeiro_hotel(df_servicos, value, intervalo_inicial_natal, intervalo_inicial_pipa, intervalo_inicial_sao_miguel, 
+                                           intervalo_inicial_galinhos, intervalo_inicial_camurupim)
                                 
                                 data_horario_primeiro_hotel = df_servicos.at[value, 'Data Horario Apresentacao']
                                 
@@ -1181,8 +1185,8 @@ def gerar_roteiros_alternativos(df_servicos, max_hoteis_ref):
     
                 if index==0:
     
-                    df_ref.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref, index, intervalo_inicial_joao_pessoa, intervalo_inicial_pitimbu, intervalo_inicial_recife, 
-                                   intervalo_inicial_campina_grande)
+                    df_ref.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref, index, intervalo_inicial_natal, intervalo_inicial_pipa, intervalo_inicial_sao_miguel, 
+                                           intervalo_inicial_galinhos, intervalo_inicial_camurupim)
                     
                     data_horario_primeiro_hotel = df_ref.at[index, 'Data Horario Apresentacao']
                     
@@ -1215,8 +1219,8 @@ def gerar_roteiros_alternativos(df_servicos, max_hoteis_ref):
     
                         carros+=1
     
-                        df_ref.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref, index, intervalo_inicial_joao_pessoa, intervalo_inicial_pitimbu, intervalo_inicial_recife, 
-                                   intervalo_inicial_campina_grande)
+                        df_ref.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref, index, intervalo_inicial_natal, intervalo_inicial_pipa, intervalo_inicial_sao_miguel, 
+                                           intervalo_inicial_galinhos, intervalo_inicial_camurupim)
                         
                         paxs_hotel = df_ref[df_ref['Est Origem']==df_ref.at[index, 'Est Origem']]['Total ADT | CHD'].sum()
     
@@ -1249,8 +1253,8 @@ def gerar_roteiros_alternativos(df_servicos, max_hoteis_ref):
     
                             carros+=1
     
-                            df_ref.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref, index, intervalo_inicial_joao_pessoa, intervalo_inicial_pitimbu, intervalo_inicial_recife, 
-                                   intervalo_inicial_campina_grande)
+                            df_ref.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref, index, intervalo_inicial_natal, intervalo_inicial_pipa, intervalo_inicial_sao_miguel, 
+                                           intervalo_inicial_galinhos, intervalo_inicial_camurupim)
     
                             data_horario_primeiro_hotel = df_ref.at[index, 'Data Horario Apresentacao']
     
@@ -1290,8 +1294,8 @@ def gerar_roteiros_alternativos(df_servicos, max_hoteis_ref):
     
                                 carros+=1
     
-                                df_ref.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref, index, intervalo_inicial_joao_pessoa, intervalo_inicial_pitimbu, intervalo_inicial_recife, 
-                                   intervalo_inicial_campina_grande)
+                                df_ref.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref, index, intervalo_inicial_natal, intervalo_inicial_pipa, intervalo_inicial_sao_miguel, 
+                                           intervalo_inicial_galinhos, intervalo_inicial_camurupim)
     
                                 data_horario_primeiro_hotel = df_ref.at[index, 'Data Horario Apresentacao']
     
@@ -1345,8 +1349,8 @@ def gerar_roteiros_alternativos_2(df_servicos, max_hoteis_ref, intervalo_pu_hote
     
                 if index==0:
     
-                    df_ref.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref, index, intervalo_inicial_joao_pessoa, intervalo_inicial_pitimbu, intervalo_inicial_recife, 
-                                   intervalo_inicial_campina_grande)
+                    df_ref.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref, index, intervalo_inicial_natal, intervalo_inicial_pipa, intervalo_inicial_sao_miguel, 
+                                           intervalo_inicial_galinhos, intervalo_inicial_camurupim)
                     
                     data_horario_primeiro_hotel = df_ref.at[index, 'Data Horario Apresentacao']
                     
@@ -1379,8 +1383,8 @@ def gerar_roteiros_alternativos_2(df_servicos, max_hoteis_ref, intervalo_pu_hote
     
                         carros+=1
     
-                        df_ref.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref, index, intervalo_inicial_joao_pessoa, intervalo_inicial_pitimbu, intervalo_inicial_recife, 
-                                   intervalo_inicial_campina_grande)
+                        df_ref.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref, index, intervalo_inicial_natal, intervalo_inicial_pipa, intervalo_inicial_sao_miguel, 
+                                           intervalo_inicial_galinhos, intervalo_inicial_camurupim)
                         
                         paxs_hotel = df_ref[df_ref['Est Origem']==df_ref.at[index, 'Est Origem']]['Total ADT | CHD'].sum()
     
@@ -1413,8 +1417,8 @@ def gerar_roteiros_alternativos_2(df_servicos, max_hoteis_ref, intervalo_pu_hote
     
                             carros+=1
     
-                            df_ref.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref, index, intervalo_inicial_joao_pessoa, intervalo_inicial_pitimbu, intervalo_inicial_recife, 
-                                   intervalo_inicial_campina_grande)
+                            df_ref.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref, index, intervalo_inicial_natal, intervalo_inicial_pipa, intervalo_inicial_sao_miguel, 
+                                           intervalo_inicial_galinhos, intervalo_inicial_camurupim)
     
                             data_horario_primeiro_hotel = df_ref.at[index, 'Data Horario Apresentacao']
     
@@ -1454,8 +1458,8 @@ def gerar_roteiros_alternativos_2(df_servicos, max_hoteis_ref, intervalo_pu_hote
     
                                 carros+=1
     
-                                df_ref.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref, index, intervalo_inicial_joao_pessoa, intervalo_inicial_pitimbu, intervalo_inicial_recife, 
-                                   intervalo_inicial_campina_grande)
+                                df_ref.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref, index, intervalo_inicial_natal, intervalo_inicial_pipa, intervalo_inicial_sao_miguel, 
+                                           intervalo_inicial_galinhos, intervalo_inicial_camurupim)
     
                                 data_horario_primeiro_hotel = df_ref.at[index, 'Data Horario Apresentacao']
     
@@ -1517,8 +1521,8 @@ def gerar_roteiros_alternativos_3(df_servicos):
     
                 if index==0:
     
-                    df_ref.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref, index, intervalo_inicial_joao_pessoa, intervalo_inicial_pitimbu, intervalo_inicial_recife, 
-                                   intervalo_inicial_campina_grande)
+                    df_ref.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref, index, intervalo_inicial_natal, intervalo_inicial_pipa, intervalo_inicial_sao_miguel, 
+                                           intervalo_inicial_galinhos, intervalo_inicial_camurupim)
                     
                     data_horario_primeiro_hotel = df_ref.at[index, 'Data Horario Apresentacao']
                     
@@ -1556,8 +1560,8 @@ def gerar_roteiros_alternativos_3(df_servicos):
             
                                 carros+=1
             
-                                df_ref.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref, index, intervalo_inicial_joao_pessoa, intervalo_inicial_pitimbu, intervalo_inicial_recife, 
-                                   intervalo_inicial_campina_grande)
+                                df_ref.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref, index, intervalo_inicial_natal, intervalo_inicial_pipa, intervalo_inicial_sao_miguel, 
+                                           intervalo_inicial_galinhos, intervalo_inicial_camurupim)
                                 
                                 paxs_hotel = df_ref[df_ref['Est Origem']==df_ref.at[index, 'Est Origem']]['Total ADT | CHD'].sum()
             
@@ -1588,8 +1592,8 @@ def gerar_roteiros_alternativos_3(df_servicos):
             
                                     carros+=1
             
-                                    df_ref.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref, index, intervalo_inicial_joao_pessoa, intervalo_inicial_pitimbu, intervalo_inicial_recife, 
-                                   intervalo_inicial_campina_grande)
+                                    df_ref.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref, index, intervalo_inicial_natal, intervalo_inicial_pipa, intervalo_inicial_sao_miguel, 
+                                           intervalo_inicial_galinhos, intervalo_inicial_camurupim)
             
                                     data_horario_primeiro_hotel = df_ref.at[index, 'Data Horario Apresentacao']
             
@@ -1629,8 +1633,8 @@ def gerar_roteiros_alternativos_3(df_servicos):
             
                                         carros+=1
             
-                                        df_ref.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref, index, intervalo_inicial_joao_pessoa, intervalo_inicial_pitimbu, intervalo_inicial_recife, 
-                                   intervalo_inicial_campina_grande)
+                                        df_ref.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref, index, intervalo_inicial_natal, intervalo_inicial_pipa, intervalo_inicial_sao_miguel, 
+                                           intervalo_inicial_galinhos, intervalo_inicial_camurupim)
             
                                         data_horario_primeiro_hotel = df_ref.at[index, 'Data Horario Apresentacao']
             
@@ -1656,8 +1660,8 @@ def gerar_roteiros_alternativos_3(df_servicos):
 
                             carros+=1
             
-                            df_ref.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref, index, intervalo_inicial_joao_pessoa, intervalo_inicial_pitimbu, intervalo_inicial_recife, 
-                                   intervalo_inicial_campina_grande)
+                            df_ref.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref, index, intervalo_inicial_natal, intervalo_inicial_pipa, intervalo_inicial_sao_miguel, 
+                                           intervalo_inicial_galinhos, intervalo_inicial_camurupim)
                             
                             paxs_hotel = df_ref[df_ref['Est Origem']==df_ref.at[index, 'Est Origem']]['Total ADT | CHD'].sum()
         
@@ -1683,8 +1687,8 @@ def gerar_roteiros_alternativos_3(df_servicos):
         
                             carros+=1
         
-                            df_ref.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref, index, intervalo_inicial_joao_pessoa, intervalo_inicial_pitimbu, intervalo_inicial_recife, 
-                                   intervalo_inicial_campina_grande)
+                            df_ref.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref, index, intervalo_inicial_natal, intervalo_inicial_pipa, intervalo_inicial_sao_miguel, 
+                                           intervalo_inicial_galinhos, intervalo_inicial_camurupim)
                             
                             paxs_hotel = df_ref[df_ref['Est Origem']==df_ref.at[index, 'Est Origem']]['Total ADT | CHD'].sum()
         
@@ -1717,8 +1721,8 @@ def gerar_roteiros_alternativos_3(df_servicos):
         
                                 carros+=1
         
-                                df_ref.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref, index, intervalo_inicial_joao_pessoa, intervalo_inicial_pitimbu, intervalo_inicial_recife, 
-                                   intervalo_inicial_campina_grande)
+                                df_ref.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref, index, intervalo_inicial_natal, intervalo_inicial_pipa, intervalo_inicial_sao_miguel, 
+                                           intervalo_inicial_galinhos, intervalo_inicial_camurupim)
         
                                 data_horario_primeiro_hotel = df_ref.at[index, 'Data Horario Apresentacao']
         
@@ -1829,8 +1833,8 @@ def gerar_roteiros_apoio(df_servicos):
 
             if index==0:
 
-                df_ref_apoios.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref_apoios, index, intervalo_inicial_joao_pessoa, intervalo_inicial_pitimbu, intervalo_inicial_recife, 
-                                   intervalo_inicial_campina_grande)
+                df_ref_apoios.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref_apoios, index, intervalo_inicial_natal, intervalo_inicial_pipa, intervalo_inicial_sao_miguel, 
+                                           intervalo_inicial_galinhos, intervalo_inicial_camurupim)
 
                 df_ref_apoios.at[index, 'Data Horario Apresentacao']-=intervalo_hoteis_bairros_iguais
                 
@@ -1867,8 +1871,8 @@ def gerar_roteiros_apoio(df_servicos):
 
                     carros+=1
 
-                    df_ref_apoios.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref_apoios, index, intervalo_inicial_joao_pessoa, intervalo_inicial_pitimbu, intervalo_inicial_recife, 
-                                   intervalo_inicial_campina_grande)
+                    df_ref_apoios.at[index, 'Data Horario Apresentacao']=definir_horario_primeiro_hotel(df_ref_apoios, index, intervalo_inicial_natal, intervalo_inicial_pipa, intervalo_inicial_sao_miguel, 
+                                           intervalo_inicial_galinhos, intervalo_inicial_camurupim)
 
                     paxs_total_roteiro = 0
 
@@ -3247,7 +3251,7 @@ def plotar_roteiros_gerais_final(df_servicos, df_apoios, df_alternativos, df_apo
 
 st.set_page_config(layout='wide')
 
-st.title('Roteirizador de Transfer Out - João Pessoa')
+st.title('Roteirizador de Transfer Out - Natal')
 
 st.divider()
 
@@ -3294,21 +3298,30 @@ if not 'df_router' in st.session_state:
 
     st.session_state.df_router = gerar_df_phoenix('vw_router')
 
+    dict_nomes_servicos = {'OUT Touros - hotéis Parceiros': 'OUT - Touros', 'OUT Natal - Hotéis Parceiros ': 'OUT - Natal', 
+                            'OUT Pipa - Hotéis Parceiros': 'OUT - Pipa', 'Black - OUT Natal': 'OUT - Natal'}
+
+    st.session_state.df_router['Servico'] = st.session_state.df_router['Servico'].replace(dict_nomes_servicos)
+
+    st.session_state.df_router = st.session_state.df_router[st.session_state.df_router['Servico']!='OUT - Tripulacao']\
+        .reset_index(drop=True)
+
 # Puxando dados de hoteis das planilhas
 
-if not 'df_joao pessoa' in st.session_state:
+if not 'df_natal' in st.session_state:
 
     puxar_sequencias_hoteis()
 
     st.session_state.dict_regioes_hoteis = \
-        {'HOTEL CAMPINA GRANDE / AEROPORTO CAMPINA GRANDE': ['df_campina_grande', 'Campina Grande', 'Hoteis Campina Grande', 
-                                                             'Campina Grande'], 
-         'HOTÉIS PITIMBU / AEROPORTO RECIFE': ['df_pitimbu', 'Pitimbu', 'Hoteis Pitimbu', 'Pitimbú'], 
-         'HOTÉIS JOÃO PESSOA / AEROPORTO RECIFE': ['df_joao_pessoa', 'João Pessoa', 'Hoteis Joao Pessoa', 'João Pessoa'], 
-         'HOTÉIS CAMPINA GRANDE / AEROPORTO JOÃO PESSOA': ['df_campina_grande', 'Campina Grande', 'Hoteis Campina Grande', 
-                                                           'Campina Grande'], 
-         'HOTÉIS JOÃO PESSOA / AEROPORTO JOÃO PESSOA': ['df_joao_pessoa', 'João Pessoa', 'Hoteis Joao Pessoa', 'João Pessoa'], 
-         'HOTÉIS PITIMBU / AEROPORTO JOÃO PESSOA': ['df_pitimbu', 'Pitimbu', 'Hoteis Pitimbu', 'Pitimbú']}
+        {'OUT - Natal': ['df_natal', 'Natal', 'Hoteis Natal', 'Natal'], 
+         'OUT - Pipa': ['df_pipa', 'Pipa', 'Hoteis Pipa', 'Pipa'], 
+         'OUT - Touros': ['df_touros', 'Touros', 'Hoteis Touros', 'Touros'], 
+         'OUT - São Miguel Gostoso': ['df_sao_miguel', 'Sao Miguel', 'Hoteis Sao Miguel', 'São Miguel'], 
+         'Out - Galinhos': ['df_galinhos', 'Galinhos', 'Hoteis Galinhos', 'Galinhos'], 
+         'OUT - Camurupim': ['df_camurupim', 'Camurupim', 'Hoteis Camurupim', 'Camurupim'], 
+         'Out - Genipabu': ['df_genipabu', 'Genipabu', 'Hoteis Genipabu', 'Genipabu'], 
+         'OUT - Pirangi': ['df_pirangi', 'Pirangi', 'Hoteis Pirangi', 'Pirangi'], 
+         'OUT - Baia Formosa': ['df_baia_formosa', 'Baia Formosa', 'Hoteis Baia Formosa', 'Baia Formosa']}
 
 row1 = st.columns(3)
 
@@ -3316,34 +3329,37 @@ row1 = st.columns(3)
 
 with row1[0]:
 
-    intervalo_inicial_joao_pessoa = objeto_intervalo('Horário Último Hotel | João Pessoa', datetime.time(2, 45), 
-                                                     'intervalo_inicial_joao_pessoa')
-
-    intervalo_pu_hotel = objeto_intervalo('Intervalo Hoteis | Primeiro vs Último', datetime.time(0, 45), 'intervalo_pu_hotel')
-
-    intervalo_inicial_recife = objeto_intervalo('Horário Último Hotel | Recife ou Campina Grande', datetime.time(4, 45), 
-                                                'intervalo_inicial_recife')
+    intervalo_inicial_natal = objeto_intervalo('Horário Último Hotel | Natal e Genipabu', datetime.time(3, 0), 
+                                               'intervalo_inicial_natal')
     
-    intervalo_inicial_campina_grande = objeto_intervalo('Horário Último Hotel | Campina Grande p/ Aeroporto Campina Grande', 
-                                                        datetime.time(2, 0), 'intervalo_inicial_campina_grande')
+    intervalo_inicial_pipa = objeto_intervalo('Horário Último Hotel | Pipa e Touros', datetime.time(4, 0), 'intervalo_inicial_pipa')
+    
+    intervalo_hoteis_bairros_iguais = objeto_intervalo('Intervalo Entre Hoteis de Mesmo Bairro', datetime.time(0, 5), 
+                                                       'intervalo_hoteis_bairros_iguais')
+
+    intervalo_hoteis_bairros_diferentes = objeto_intervalo('Intervalo Entre Hoteis de Bairros Diferentes', datetime.time(0, 10), 
+                                                           'intervalo_hoteis_bairros_diferentes')
 
 with row1[1]:
 
-    intervalo_hoteis_bairros_iguais = objeto_intervalo('Intervalo Hoteis | Bairros Iguais', datetime.time(0, 5), 'intervalo_bairros_iguais')
-
-    intervalo_hoteis_bairros_diferentes = objeto_intervalo('Intervalo Hoteis | Bairros Diferentes', datetime.time(0, 10), 
-                                                    'intervalo_bairros_diferentes')
+    intervalo_inicial_sao_miguel = objeto_intervalo('Horário Último Hotel | São Miguel e Baia Formosa', datetime.time(4, 30), 
+                                                    'intervalo_inicial_sao_miguel')
     
-    intervalo_inicial_pitimbu = objeto_intervalo('Horário Último Hotel | Pitimbú', datetime.time(3, 45), 'intervalo_inicial_pitimbu')
+    intervalo_inicial_galinhos = objeto_intervalo('Horário Último Hotel | Galinhos', datetime.time(5, 0), 'intervalo_inicial_galinhos')
     
-with row1[2]:
-
-    max_hoteis = st.number_input('Máximo de Hoteis por Carro', step=1, value=8, key='max_hoteis')
+    pax_max = st.number_input('Máximo de Paxs por Carro', step=1, value=50, key='pax_max')
 
     pax_cinco_min = st.number_input('Paxs Extras', step=1, value=18, key='pax_cinco_min', 
                                     help='Número de paxs para aumentar intervalo entre hoteis em 5 minutos')
+ 
+with row1[2]:
 
-    pax_max = st.number_input('Máximo de Paxs por Carro', step=1, value=46, key='pax_max')
+    intervalo_inicial_camurupim = objeto_intervalo('Horário Último Hotel | Camurupim e Pirangi', datetime.time(3, 30), 
+                                                   'intervalo_inicial_camurupim')
+
+    intervalo_pu_hotel = objeto_intervalo('Intervalo Hoteis | Primeiro vs Último', datetime.time(0, 40), 'intervalo_pu_hotel')
+
+    max_hoteis = st.number_input('Máximo de Hoteis por Carro', step=1, value=7, key='max_hoteis')
 
 st.divider()
 
@@ -3374,14 +3390,15 @@ with row2[0]:
             puxar_sequencias_hoteis()
 
             st.session_state.dict_regioes_hoteis = \
-                {'HOTEL CAMPINA GRANDE / AEROPORTO CAMPINA GRANDE': ['df_campina_grande', 'Campina Grande', 'Hoteis Campina Grande', 
-                                                                    'Campina Grande'], 
-                'HOTÉIS PITIMBU / AEROPORTO RECIFE': ['df_pitimbu', 'Pitimbu', 'Hoteis Pitimbu', 'Pitimbú'], 
-                'HOTÉIS JOÃO PESSOA / AEROPORTO RECIFE': ['df_joao_pessoa', 'João Pessoa', 'Hoteis Joao Pessoa', 'João Pessoa'], 
-                'HOTÉIS CAMPINA GRANDE / AEROPORTO JOÃO PESSOA': ['df_campina_grande', 'Campina Grande', 'Hoteis Campina Grande', 
-                                                                'Campina Grande'], 
-                'HOTÉIS JOÃO PESSOA / AEROPORTO JOÃO PESSOA': ['df_joao_pessoa', 'João Pessoa', 'Hoteis Joao Pessoa', 'João Pessoa'], 
-                'HOTÉIS PITIMBU / AEROPORTO JOÃO PESSOA': ['df_pitimbu', 'Pitimbu', 'Hoteis Pitimbu', 'Pitimbú']}
+                {'OUT - Natal': ['df_natal', 'Natal', 'Hoteis Natal', 'Natal'], 
+                'OUT - Pipa': ['df_pipa', 'Pipa', 'Hoteis Pipa', 'Pipa'], 
+                'OUT - Touros': ['df_touros', 'Touros', 'Hoteis Touros', 'Touros'], 
+                'OUT - São Miguel Gostoso': ['df_sao_miguel', 'Sao Miguel', 'Hoteis Sao Miguel', 'São Miguel'], 
+                'Out - Galinhos': ['df_galinhos', 'Galinhos', 'Hoteis Galinhos', 'Galinhos'], 
+                'OUT - Camurupim': ['df_camurupim', 'Camurupim', 'Hoteis Camurupim', 'Camurupim'], 
+                'Out - Genipabu': ['df_genipabu', 'Genipabu', 'Hoteis Genipabu', 'Genipabu'], 
+                'OUT - Pirangi': ['df_pirangi', 'Pirangi', 'Hoteis Pirangi', 'Pirangi'], 
+                'OUT - Baia Formosa': ['df_baia_formosa', 'Baia Formosa', 'Hoteis Baia Formosa', 'Baia Formosa']}
 
     # Botão Atualizar Dados Phoenix
 
@@ -3392,6 +3409,18 @@ with row2[0]:
         if atualizar_phoenix:
 
             st.session_state.df_router = gerar_df_phoenix('vw_router')
+
+            dict_nomes_servicos = {'OUT Touros - hotéis Parceiros': 'OUT - Touros', 'OUT Natal - Hotéis Parceiros ': 'OUT - Natal', 
+                                    'OUT Pipa - Hotéis Parceiros': 'OUT - Pipa', 'Black - OUT Natal': 'OUT - Natal'}
+
+            st.session_state.df_router['Servico'] = st.session_state.df_router['Servico'].replace(dict_nomes_servicos)
+
+            st.session_state.df_router = st.session_state.df_router[st.session_state.df_router['Servico']!='OUT - Tripulacao']\
+                .reset_index(drop=True)
+
+            if 'df_servico_voos_horarios' in st.session_state:
+                
+                st.session_state['df_servico_voos_horarios'] = pd.DataFrame(columns=['Servico', 'Voo', 'Horario Voo'])
 
     # Campo de data
 
