@@ -64,7 +64,7 @@ def puxar_sequencias_hoteis():
     client = gspread.authorize(credentials)
 
     # Abrir a planilha desejada pelo seu ID
-    spreadsheet = client.open_by_key('1MFQLhzOB55Amyz9qkqSB4IuajdXkYreW')
+    spreadsheet = client.open_by_key('1ch1NfOKeK008ZeqexQTzOqXuCZ2Q6sL8hY2sPqQegLQ')
 
     lista_abas = ['Hoteis Natal', 'Hoteis Pipa', 'Hoteis Touros', 'Hoteis Sao Miguel', 'Hoteis Galinhos', 'Hoteis Camurupim', 'Hoteis Genipabu', 'Hoteis Pirangi', 
                   'Hoteis Baia Formosa']
@@ -111,7 +111,7 @@ def inserir_hoteis_faltantes(itens_faltantes, df_hoteis, aba_excel, regiao):
     credentials = credentials.with_scopes(scope)
     client = gspread.authorize(credentials)
     
-    spreadsheet = client.open_by_key('1MFQLhzOB55Amyz9qkqSB4IuajdXkYreW')
+    spreadsheet = client.open_by_key('1ch1NfOKeK008ZeqexQTzOqXuCZ2Q6sL8hY2sPqQegLQ')
 
     sheet = spreadsheet.worksheet(aba_excel)
     sheet_data = sheet.get_all_values()
