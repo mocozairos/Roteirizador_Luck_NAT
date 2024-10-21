@@ -98,11 +98,12 @@ def gerar_itens_faltantes(df_servicos, df_hoteis):
 
 def inserir_hoteis_faltantes(itens_faltantes, df_hoteis, aba_excel, regiao):
 
-    df_itens_faltantes = pd.DataFrame(itens_faltantes, columns=['Est Origem'])
+    df_itens_faltantes = pd.DataFrame(itens_faltantes, columns=['Est Origem', 'Região', 'Sequência', 'Bus', 'Micro', 'Van', 
+                                                                'Hoteis Juntos p/ Apoios', 'Hoteis Juntos p/ Carro Principal'])
 
     st.dataframe(df_itens_faltantes, hide_index=True)
 
-    df_itens_faltantes[['Região', 'Sequência']]=''
+    df_itens_faltantes[['Região', 'Sequência', 'Bus', 'Micro', 'Van', 'Hoteis Juntos p/ Apoios', 'Hoteis Juntos p/ Carro Principal']]=''
 
     df_hoteis_geral = pd.concat([df_hoteis, df_itens_faltantes])
 
@@ -116,7 +117,7 @@ def inserir_hoteis_faltantes(itens_faltantes, df_hoteis, aba_excel, regiao):
 
     sheet = spreadsheet.worksheet(aba_excel)
     sheet_data = sheet.get_all_values()
-    limpar_colunas = "A:F"
+    limpar_colunas = "A:H"
     sheet.batch_clear([limpar_colunas])
     data = [df_hoteis_geral.columns.values.tolist()] + df_hoteis_geral.values.tolist()
     sheet.update("A1", data)
