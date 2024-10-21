@@ -16,7 +16,7 @@ def gerar_df_phoenix(vw_name):
     'user': 'user_automation_jpa',
     'password': 'luck_jpa_2024',
     'host': 'comeia.cixat7j68g0n.us-east-1.rds.amazonaws.com',
-    'database': 'test_phoenix_joao_pessoa'
+    'database': 'test_phoenix_natal'
     }
     # Conexão as Views
     conexao = mysql.connector.connect(**config)
