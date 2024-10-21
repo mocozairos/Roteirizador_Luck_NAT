@@ -98,8 +98,7 @@ def gerar_itens_faltantes(df_servicos, df_hoteis):
 
 def inserir_hoteis_faltantes(itens_faltantes, df_hoteis, aba_excel, regiao):
 
-    df_itens_faltantes = pd.DataFrame(itens_faltantes, columns=['Est Origem', 'Região', 'Sequência', 'Bus', 'Micro', 'Van', 
-                                                                'Hoteis Juntos p/ Apoios', 'Hoteis Juntos p/ Carro Principal'])
+    df_itens_faltantes = pd.DataFrame(itens_faltantes, columns=['Est Origem'])
 
     st.dataframe(df_itens_faltantes, hide_index=True)
 
