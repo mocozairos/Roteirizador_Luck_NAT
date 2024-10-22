@@ -4779,6 +4779,16 @@ if roteirizar:
 
         sequencia_marsol = int(sequencia_marsol)
 
+    n_max_hotel
+
+    n_max_hotel.dtype
+
+    sequencia_marsol
+
+    sequencia_marsol.dtype
+
+    st.stop()
+
     # Categorizando serviços com 'CADEIRANTE' na observação
     
     df_router_filtrado['Modo do Servico'] = df_router_filtrado.apply(
