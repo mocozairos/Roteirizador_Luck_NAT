@@ -4777,9 +4777,7 @@ if roteirizar:
         
         sequencia_marsol = df_hoteis_ref.loc[df_hoteis_ref['Est Origem'] == 'Marsol Beach Resort', 'Sequência'].values[0]
 
-    sequencia_marsol
-
-    st.stop()
+        sequencia_marsol = int(sequencia_marsol)
 
     # Categorizando serviços com 'CADEIRANTE' na observação
     
