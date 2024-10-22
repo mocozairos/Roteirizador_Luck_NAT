@@ -4740,9 +4740,10 @@ if servico_roteiro and 'df_horario_esp_ultimo_hotel' in st.session_state:
 
         st.dataframe(st.session_state.df_horario_esp_ultimo_hotel, hide_index=True) 
 
-st.session_state.df_natal
+st.session_state.df_natal['Hoteis Juntos p/ Apoios'] = \
+st.session_state.df_natal['Hoteis Juntos p/ Apoios'].apply(lambda x: None if pd.isna(x) or str(x).strip() == '' else x)
 
-st.write(st.session_state.df_natal['Hoteis Juntos p/ Apoios'].unique().tolist())
+st.session_state.df_natal
 
 # Roteirizando Regiões
 
