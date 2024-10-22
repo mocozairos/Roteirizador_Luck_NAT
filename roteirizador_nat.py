@@ -4858,24 +4858,6 @@ if roteirizar:
 
     df_roteiros_alternativos_4 = gerar_roteiros_alternativos_4(df_router_filtrado_2, max_hoteis_4)
 
-    # Roteirizando de forma invertida quando só tem hoteis até o Marsol
-
-    if servico_roteiro=='OUT - Natal':
-
-        df_router_filtrado_2 = roteirizar_natal_apenas_primeiros_hoteis(df_router_filtrado_2, sequencia_marsol)
-
-        df_juncoes_pax_max = roteirizar_natal_apenas_primeiros_hoteis(df_juncoes_pax_max, sequencia_marsol)
-
-        df_voos_pax_max = roteirizar_natal_apenas_primeiros_hoteis(df_voos_pax_max, sequencia_marsol)
-
-        df_roteiros_alternativos = roteirizar_natal_apenas_primeiros_hoteis(df_roteiros_alternativos, sequencia_marsol)
-
-        df_roteiros_alternativos_2 = roteirizar_natal_apenas_primeiros_hoteis(df_roteiros_alternativos_2, sequencia_marsol)
-
-        df_roteiros_alternativos_3 = roteirizar_natal_apenas_primeiros_hoteis(df_roteiros_alternativos_3, sequencia_marsol)
-
-        df_roteiros_alternativos_4 = roteirizar_natal_apenas_primeiros_hoteis(df_roteiros_alternativos_4, sequencia_marsol)
-
     # Identificando serviços das rotas primárias que vão precisar de apoios
 
     df_router_filtrado_2 = identificar_apoios_em_df(df_router_filtrado_2)
@@ -4935,6 +4917,24 @@ if roteirizar:
     # Roteirizando carro principal desconsiderando os hoteis do apoio
 
     df_roteiros_alternativos_4 = roteirizar_pos_apoios(df_roteiros_apoios_alternativos_4, df_roteiros_alternativos_4)
+
+    # Roteirizando de forma invertida quando só tem hoteis até o Marsol
+
+    # if servico_roteiro=='OUT - Natal':
+
+    #     df_router_filtrado_2 = roteirizar_natal_apenas_primeiros_hoteis(df_router_filtrado_2, sequencia_marsol)
+
+    #     df_juncoes_pax_max = roteirizar_natal_apenas_primeiros_hoteis(df_juncoes_pax_max, sequencia_marsol)
+
+    #     df_voos_pax_max = roteirizar_natal_apenas_primeiros_hoteis(df_voos_pax_max, sequencia_marsol)
+
+    #     df_roteiros_alternativos = roteirizar_natal_apenas_primeiros_hoteis(df_roteiros_alternativos, sequencia_marsol)
+
+    #     df_roteiros_alternativos_2 = roteirizar_natal_apenas_primeiros_hoteis(df_roteiros_alternativos_2, sequencia_marsol)
+
+    #     df_roteiros_alternativos_3 = roteirizar_natal_apenas_primeiros_hoteis(df_roteiros_alternativos_3, sequencia_marsol)
+
+    #     df_roteiros_alternativos_4 = roteirizar_natal_apenas_primeiros_hoteis(df_roteiros_alternativos_4, sequencia_marsol)
 
     # Plotando roteiros de cada carro
 
