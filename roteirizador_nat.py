@@ -120,11 +120,11 @@ def inserir_hoteis_faltantes(itens_faltantes, df_hoteis, aba_excel, regiao):
 
     st.dataframe(df_itens_faltantes, hide_index=True)
 
-    df_itens_faltantes[['Região', 'Sequência', 'Bus', 'Micro', 'Van']]=''
-
-    df_itens_faltantes[['Hoteis Juntos p/ Apoios', 'Hoteis Juntos p/ Carro Principal']]=None
+    df_itens_faltantes[['Região', 'Sequência', 'Bus', 'Micro', 'Van', 'Hoteis Juntos p/ Apoios', 'Hoteis Juntos p/ Carro Principal']]=''
 
     df_hoteis_geral = pd.concat([df_hoteis, df_itens_faltantes])
+
+    df_hoteis_geral
 
     nome_credencial = st.secrets["CREDENCIAL_SHEETS"]
     credentials = service_account.Credentials.from_service_account_info(nome_credencial)
