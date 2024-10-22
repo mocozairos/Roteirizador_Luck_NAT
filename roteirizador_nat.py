@@ -4982,9 +4982,9 @@ if roteirizar:
 
     coluna = 0
 
-    hora_execucao = datetime.now().strftime("%Hh%Mm")
+    hora_execucao = datetime.now().strftime("%d/%m/%Y %Hh%Mm")
 
-    st.session_state.nome_html = f"{str(data_roteiro.strftime('%d-%m-%Y'))} {hora_execucao} {nome_html_ref}.html"
+    st.session_state.nome_html = f"{hora_execucao} {nome_html_ref}.html"
 
     st.session_state.df_hoteis_pax_max = df_hoteis_pax_max
 
