@@ -4982,7 +4982,7 @@ if roteirizar:
 
     coluna = 0
 
-    hora_execucao = datetime.now().strftime("%d/%m/%Y %Hh%Mm")
+    hora_execucao = datetime.now().strftime("%d-%m-%Y %Hh%Mm")
 
     st.session_state.nome_html = f"{hora_execucao} {nome_html_ref}.html"
 
