@@ -4126,15 +4126,7 @@ def roteirizar_natal_apenas_primeiros_hoteis(df_router_filtrado_2, sequencia_mar
 
             n_max_hotel = df_ref['Sequência'].max()
 
-            n_max_hotel
-
-            n_max_hotel.dtype
-        
-            sequencia_marsol
-        
-            sequencia_marsol.dtype
-        
-            st.stop()
+            n_max_hotel = int(n_max_hotel)
 
             if n_max_hotel<=sequencia_marsol:
 
