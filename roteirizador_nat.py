@@ -4126,14 +4126,6 @@ def roteirizar_natal_apenas_primeiros_hoteis(df_router_filtrado_2, sequencia_mar
 
             n_max_hotel = df_ref['Sequência'].max()
 
-            st.write(n_max_hotel)
-
-            st.write(type(n_max_hotel))
-
-            st.write(sequencia_marsol)
-
-            st.write(type(sequencia_marsol))
-
             if n_max_hotel<=sequencia_marsol:
 
                 df_ref_ordenado = df_ref.sort_values(by='Sequência').reset_index(drop=True)
@@ -4785,8 +4777,6 @@ if roteirizar:
         
         sequencia_marsol = df_hoteis_ref.loc[df_hoteis_ref['Est Origem'] == 'Marsol Beach Resort', 'Sequência'].values[0]
 
-        # sequencia_marsol = int(sequencia_marsol)
-
     # Categorizando serviços com 'CADEIRANTE' na observação
     
     df_router_filtrado['Modo do Servico'] = df_router_filtrado.apply(
@@ -4868,6 +4858,24 @@ if roteirizar:
 
     df_roteiros_alternativos_4 = gerar_roteiros_alternativos_4(df_router_filtrado_2, max_hoteis_4)
 
+    # Roteirizando de forma invertida quando só tem hoteis até o Marsol
+
+    if servico_roteiro=='OUT - Natal':
+
+        df_router_filtrado_2 = roteirizar_natal_apenas_primeiros_hoteis(df_router_filtrado_2, sequencia_marsol)
+
+        df_juncoes_pax_max = roteirizar_natal_apenas_primeiros_hoteis(df_juncoes_pax_max, sequencia_marsol)
+
+        df_voos_pax_max = roteirizar_natal_apenas_primeiros_hoteis(df_voos_pax_max, sequencia_marsol)
+
+        df_roteiros_alternativos = roteirizar_natal_apenas_primeiros_hoteis(df_roteiros_alternativos, sequencia_marsol)
+
+        df_roteiros_alternativos_2 = roteirizar_natal_apenas_primeiros_hoteis(df_roteiros_alternativos_2, sequencia_marsol)
+
+        df_roteiros_alternativos_3 = roteirizar_natal_apenas_primeiros_hoteis(df_roteiros_alternativos_3, sequencia_marsol)
+
+        df_roteiros_alternativos_4 = roteirizar_natal_apenas_primeiros_hoteis(df_roteiros_alternativos_4, sequencia_marsol)
+
     # Identificando serviços das rotas primárias que vão precisar de apoios
 
     df_router_filtrado_2 = identificar_apoios_em_df(df_router_filtrado_2)
@@ -4927,24 +4935,6 @@ if roteirizar:
     # Roteirizando carro principal desconsiderando os hoteis do apoio
 
     df_roteiros_alternativos_4 = roteirizar_pos_apoios(df_roteiros_apoios_alternativos_4, df_roteiros_alternativos_4)
-
-    # Roteirizando de forma invertida quando só tem hoteis até o Marsol
-
-    if servico_roteiro=='OUT - Natal':
-
-        df_router_filtrado_2 = roteirizar_natal_apenas_primeiros_hoteis(df_router_filtrado_2, sequencia_marsol)
-
-        df_juncoes_pax_max = roteirizar_natal_apenas_primeiros_hoteis(df_juncoes_pax_max, sequencia_marsol)
-
-        df_voos_pax_max = roteirizar_natal_apenas_primeiros_hoteis(df_voos_pax_max, sequencia_marsol)
-
-        df_roteiros_alternativos = roteirizar_natal_apenas_primeiros_hoteis(df_roteiros_alternativos, sequencia_marsol)
-
-        df_roteiros_alternativos_2 = roteirizar_natal_apenas_primeiros_hoteis(df_roteiros_alternativos_2, sequencia_marsol)
-
-        df_roteiros_alternativos_3 = roteirizar_natal_apenas_primeiros_hoteis(df_roteiros_alternativos_3, sequencia_marsol)
-
-        df_roteiros_alternativos_4 = roteirizar_natal_apenas_primeiros_hoteis(df_roteiros_alternativos_4, sequencia_marsol)
 
     # Plotando roteiros de cada carro
 
