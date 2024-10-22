@@ -4121,8 +4121,8 @@ def roteirizar_natal_apenas_primeiros_hoteis(df_router_filtrado_2, sequencia_mar
 
             carro_ref = df_roteiro_carro.at[index, 'Carros']
 
-            df_ref = df_router_filtrado_2[(df_router_filtrado_2['Roteiro']==roteiro_ref) & (df_router_filtrado_2['Carros']==carro_ref) & 
-                                          (df_router_filtrado_2['Apoios']=='')].reset_index()
+            df_ref = df_router_filtrado_2[(df_router_filtrado_2['Roteiro']==roteiro_ref) & 
+            (df_router_filtrado_2['Carros']==carro_ref)].reset_index()
 
             n_max_hotel = df_ref['Sequência'].max()
 
