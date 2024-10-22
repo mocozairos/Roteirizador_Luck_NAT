@@ -122,7 +122,7 @@ def inserir_hoteis_faltantes(itens_faltantes, df_hoteis, aba_excel, regiao):
 
     df_itens_faltantes[['Região', 'Sequência', 'Bus', 'Micro', 'Van', 'Hoteis Juntos p/ Apoios', 'Hoteis Juntos p/ Carro Principal']]=''
 
-    for coluna in ['Região', 'Sequência', 'Bus', 'Micro', 'Van', 'Hoteis Juntos p/ Apoios', 'Hoteis Juntos p/ Carro Principal']:
+    for coluna in ['Bus', 'Micro', 'Van', 'Hoteis Juntos p/ Apoios', 'Hoteis Juntos p/ Carro Principal']:
 
         df_itens_faltantes[coluna] = \
         df_itens_faltantes[coluna].apply(lambda x: None if pd.isna(x) or str(x).strip() == '' else x)
