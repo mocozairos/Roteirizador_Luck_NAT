@@ -84,6 +84,9 @@ def puxar_sequencias_hoteis():
 
         st.session_state[df_hotel] = pd.DataFrame(sheet_data[1:], columns=sheet_data[0])
 
+        st.session_state[df_hotel]['Hoteis Juntos p/ Apoios'] = \
+        st.session_state[df_hotel]['Hoteis Juntos p/ Apoios'].apply(lambda x: None if pd.isna(x) or str(x).strip() == '' else x)
+
 def gerar_itens_faltantes(df_servicos, df_hoteis):
 
     lista_hoteis_df_router = df_servicos['Est Origem'].unique().tolist()
@@ -4739,9 +4742,6 @@ if servico_roteiro and 'df_horario_esp_ultimo_hotel' in st.session_state:
             st.session_state.df_horario_esp_ultimo_hotel = pd.DataFrame(columns=['Junção/Voo/Reserva', 'Antecipação Último Hotel'])
 
         st.dataframe(st.session_state.df_horario_esp_ultimo_hotel, hide_index=True) 
-
-st.session_state.df_natal['Hoteis Juntos p/ Apoios'] = \
-st.session_state.df_natal['Hoteis Juntos p/ Apoios'].apply(lambda x: None if pd.isna(x) or str(x).strip() == '' else x)
 
 st.session_state.df_natal
 
