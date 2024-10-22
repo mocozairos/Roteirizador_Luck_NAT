@@ -122,7 +122,7 @@ def inserir_hoteis_faltantes(itens_faltantes, df_hoteis, aba_excel, regiao):
 
     df_itens_faltantes[['Região', 'Sequência', 'Bus', 'Micro', 'Van', 'Hoteis Juntos p/ Apoios', 'Hoteis Juntos p/ Carro Principal']]=''
 
-    df_hoteis_geral = pd.concat([df_hoteis, df_itens_faltantes])
+    df_hoteis_geral = pd.concat([df_hoteis, df_itens_faltantes], ignore_index=True)
 
     df_hoteis_geral
 
