@@ -96,6 +96,12 @@ def puxar_sequencias_hoteis():
         st.session_state[df_hotel]['Hoteis Juntos p/ Carro Principal'] = \
         pd.to_numeric(st.session_state[df_hotel]['Hoteis Juntos p/ Carro Principal'], errors='coerce')
 
+        st.session_state[df_hotel]['Bus'] = \
+        st.session_state[df_hotel]['Bus'].apply(lambda x: None if pd.isna(x) or str(x).strip() == '' else x)
+
+        st.session_state[df_hotel]['Micro'] = \
+        st.session_state[df_hotel]['Micro'].apply(lambda x: None if pd.isna(x) or str(x).strip() == '' else x)
+
 def gerar_itens_faltantes(df_servicos, df_hoteis):
 
     lista_hoteis_df_router = df_servicos['Est Origem'].unique().tolist()
