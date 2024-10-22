@@ -4126,7 +4126,13 @@ def roteirizar_natal_apenas_primeiros_hoteis(df_router_filtrado_2, sequencia_mar
 
             n_max_hotel = df_ref['Sequência'].max()
 
-            n_max_hotel = int(n_max_hotel)
+            st.write(n_max_hotel)
+
+            st.write(type(n_max_hotel))
+
+            st.write(sequencia_marsol)
+
+            st.write(type(sequencia_marsol))
 
             if n_max_hotel<=sequencia_marsol:
 
@@ -4779,7 +4785,7 @@ if roteirizar:
         
         sequencia_marsol = df_hoteis_ref.loc[df_hoteis_ref['Est Origem'] == 'Marsol Beach Resort', 'Sequência'].values[0]
 
-        sequencia_marsol = int(sequencia_marsol)
+        # sequencia_marsol = int(sequencia_marsol)
 
     # Categorizando serviços com 'CADEIRANTE' na observação
     
