@@ -4121,8 +4121,8 @@ def roteirizar_natal_apenas_primeiros_hoteis(df_router_filtrado_2, sequencia_mar
 
             carro_ref = df_roteiro_carro.at[index, 'Carros']
 
-            df_ref = df_router_filtrado_2[(df_router_filtrado_2['Roteiro']==roteiro_ref) & 
-            (df_router_filtrado_2['Carros']==carro_ref)].reset_index()
+            df_ref = df_router_filtrado_2[(df_router_filtrado_2['Roteiro']==roteiro_ref) & (df_router_filtrado_2['Carros']==carro_ref) & 
+                                          (df_router_filtrado_2['Apoios']=='')].reset_index()
 
             n_max_hotel = df_ref['Sequência'].max()
 
@@ -4920,21 +4920,21 @@ if roteirizar:
 
     # Roteirizando de forma invertida quando só tem hoteis até o Marsol
 
-    # if servico_roteiro=='OUT - Natal':
+    if servico_roteiro=='OUT - Natal':
 
-    #     df_router_filtrado_2 = roteirizar_natal_apenas_primeiros_hoteis(df_router_filtrado_2, sequencia_marsol)
+        df_router_filtrado_2 = roteirizar_natal_apenas_primeiros_hoteis(df_router_filtrado_2, sequencia_marsol)
 
-    #     df_juncoes_pax_max = roteirizar_natal_apenas_primeiros_hoteis(df_juncoes_pax_max, sequencia_marsol)
+        df_juncoes_pax_max = roteirizar_natal_apenas_primeiros_hoteis(df_juncoes_pax_max, sequencia_marsol)
 
-    #     df_voos_pax_max = roteirizar_natal_apenas_primeiros_hoteis(df_voos_pax_max, sequencia_marsol)
+        df_voos_pax_max = roteirizar_natal_apenas_primeiros_hoteis(df_voos_pax_max, sequencia_marsol)
 
-    #     df_roteiros_alternativos = roteirizar_natal_apenas_primeiros_hoteis(df_roteiros_alternativos, sequencia_marsol)
+        df_roteiros_alternativos = roteirizar_natal_apenas_primeiros_hoteis(df_roteiros_alternativos, sequencia_marsol)
 
-    #     df_roteiros_alternativos_2 = roteirizar_natal_apenas_primeiros_hoteis(df_roteiros_alternativos_2, sequencia_marsol)
+        df_roteiros_alternativos_2 = roteirizar_natal_apenas_primeiros_hoteis(df_roteiros_alternativos_2, sequencia_marsol)
 
-    #     df_roteiros_alternativos_3 = roteirizar_natal_apenas_primeiros_hoteis(df_roteiros_alternativos_3, sequencia_marsol)
+        df_roteiros_alternativos_3 = roteirizar_natal_apenas_primeiros_hoteis(df_roteiros_alternativos_3, sequencia_marsol)
 
-    #     df_roteiros_alternativos_4 = roteirizar_natal_apenas_primeiros_hoteis(df_roteiros_alternativos_4, sequencia_marsol)
+        df_roteiros_alternativos_4 = roteirizar_natal_apenas_primeiros_hoteis(df_roteiros_alternativos_4, sequencia_marsol)
 
     # Plotando roteiros de cada carro
 
