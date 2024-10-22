@@ -122,14 +122,7 @@ def inserir_hoteis_faltantes(itens_faltantes, df_hoteis, aba_excel, regiao):
 
     df_itens_faltantes[['Região', 'Sequência', 'Bus', 'Micro', 'Van', 'Hoteis Juntos p/ Apoios', 'Hoteis Juntos p/ Carro Principal']]=''
 
-    for coluna in ['Bus', 'Micro', 'Van', 'Hoteis Juntos p/ Apoios', 'Hoteis Juntos p/ Carro Principal']:
-
-        df_itens_faltantes[coluna] = \
-        df_itens_faltantes[coluna].fillna('')
-
-    df_hoteis_geral = pd.concat([df_hoteis, df_itens_faltantes], ignore_index=True)
-
-    df_hoteis_geral
+    # df_hoteis_geral = pd.concat([df_hoteis, df_itens_faltantes], ignore_index=True)
 
     nome_credencial = st.secrets["CREDENCIAL_SHEETS"]
     credentials = service_account.Credentials.from_service_account_info(nome_credencial)
@@ -141,10 +134,16 @@ def inserir_hoteis_faltantes(itens_faltantes, df_hoteis, aba_excel, regiao):
 
     sheet = spreadsheet.worksheet(aba_excel)
     sheet_data = sheet.get_all_values()
-    limpar_colunas = "A:H"
-    sheet.batch_clear([limpar_colunas])
-    data = [df_hoteis_geral.columns.values.tolist()] + df_hoteis_geral.values.tolist()
-    sheet.update("A1", data)
+    last_filled_row = len(sheet_data)
+    # limpar_colunas = "A:H"
+    # sheet.batch_clear([limpar_colunas])
+    # data = [df_hoteis_geral.columns.values.tolist()] + df_hoteis_geral.values.tolist()
+    data = df_itens_faltantes.values.tolist()
+    # sheet.update("A1", data)
+    start_row = last_filled_row + 1
+    start_cell = f"A{start_row}"
+    
+    sheet.update(start_cell, data)
 
     st.error('Os hoteis acima não estão cadastrados na lista de sequência de hoteis.' + 
              f' Eles foram inseridos no final da lista de {regiao}. Por favor, coloque-os na sequência e tente novamente')
