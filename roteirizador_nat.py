@@ -4162,11 +4162,11 @@ def roteirizar_natal_apenas_primeiros_hoteis(df_router_filtrado_2, sequencia_mar
 
             n_max_hotel = df_ref['Sequência'].max()
 
-            if n_max_hotel<=sequencia_marsol:
+            if n_max_hotel<=sequencia_marsol and len(df_ref)>1:
 
                 df_ref_ordenado = df_ref.sort_values(by='Sequência').reset_index(drop=True)
 
-                df_ref_ordenado = gerar_horarios_apresentacao_2(df_ref)
+                df_ref_ordenado = gerar_horarios_apresentacao_2(df_ref_ordenado)
 
                 for index_2, value in df_ref_ordenado['index'].items():
 
