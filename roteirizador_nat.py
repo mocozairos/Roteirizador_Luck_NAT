@@ -93,6 +93,9 @@ def puxar_sequencias_hoteis():
         st.session_state[df_hotel]['Hoteis Juntos p/ Carro Principal'] = \
         st.session_state[df_hotel]['Hoteis Juntos p/ Carro Principal'].apply(lambda x: None if pd.isna(x) or str(x).strip() == '' else x)
 
+        st.session_state[df_hotel]['Hoteis Juntos p/ Carro Principal'] = \
+        pd.to_numeric(st.session_state[df_hotel]['Hoteis Juntos p/ Carro Principal'], errors='coerce')
+
 def gerar_itens_faltantes(df_servicos, df_hoteis):
 
     lista_hoteis_df_router = df_servicos['Est Origem'].unique().tolist()
@@ -2172,7 +2175,19 @@ def identificar_apoios_em_df(df_servicos):
 
                     df_servicos.at[index, 'Apoios']='X'
 
-    df_servicos.loc[df_servicos['Região']=='CAMURUPIM', 'Apoios']='Y'
+            if len(df_ref_2)>1:
+
+                for index in range(len(df_ref_2)):
+
+                    indice = df_ref_2.at[index, 'index']
+
+                    regiao_ref = df_ref_2.at[index, 'Região']
+
+                    if regiao_ref == 'CAMURUPIM':
+
+                        df_servicos.at[indice, 'Apoios']='Y'
+
+    # df_servicos.loc[df_servicos['Região']=='CAMURUPIM', 'Apoios']='Y'
 
     return df_servicos
 
@@ -4748,8 +4763,6 @@ if servico_roteiro and 'df_horario_esp_ultimo_hotel' in st.session_state:
             st.session_state.df_horario_esp_ultimo_hotel = pd.DataFrame(columns=['Junção/Voo/Reserva', 'Antecipação Último Hotel'])
 
         st.dataframe(st.session_state.df_horario_esp_ultimo_hotel, hide_index=True) 
-
-st.session_state.df_natal
 
 # Roteirizando Regiões
 
