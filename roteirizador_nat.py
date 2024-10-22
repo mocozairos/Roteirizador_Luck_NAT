@@ -87,6 +87,9 @@ def puxar_sequencias_hoteis():
         st.session_state[df_hotel]['Hoteis Juntos p/ Apoios'] = \
         st.session_state[df_hotel]['Hoteis Juntos p/ Apoios'].apply(lambda x: None if pd.isna(x) or str(x).strip() == '' else x)
 
+        st.session_state[df_hotel]['Hoteis Juntos p/ Apoios'] = \
+        pd.to_numeric(st.session_state[df_hotel]['Hoteis Juntos p/ Apoios'], errors='coerce')
+
         st.session_state[df_hotel]['Hoteis Juntos p/ Carro Principal'] = \
         st.session_state[df_hotel]['Hoteis Juntos p/ Carro Principal'].apply(lambda x: None if pd.isna(x) or str(x).strip() == '' else x)
 
