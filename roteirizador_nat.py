@@ -2945,13 +2945,59 @@ def criar_output_html(nome_html, html):
 
             nome_regiao = nome_regiao.replace('.html', '')
 
-            file.write(f'<p style="font-size:50px;">{nome_regiao}</p>\n\n')
+            file.write(f'<p style="font-size:50px;">{nome_regiao} | {st.session_state.data_roteiro}</p>\n\n')
 
             file.write(f'<p style="font-size:40px;">Junção de Voos</p>\n\n')
             
             file.write(html)
 
             file.write('\n\n\n')
+
+            file.write(f'<p style="font-size:40px;">Roteiros</p>\n\n')
+
+        if len(st.session_state.df_horario_esp_ultimo_hotel)>0:
+
+            html = definir_html_2(st.session_state.df_horario_esp_ultimo_hotel)
+    
+            with open(nome_html, "a", encoding="utf-8") as file:
+    
+                file.write(f'<p style="font-size:40px;">Antecipações Específicas</p>')
+                
+                file.write(html)
+
+        with open(nome_html, "a", encoding="utf-8") as file:
+
+            nome_regiao = nome_html.split()[2]
+
+            nome_regiao = nome_regiao.replace('.html', '')
+
+            file.write(f'<p style="font-size:50px;">{nome_regiao}</p>\n\n')
+
+            file.write(f'<p style="font-size:40px;">Roteiros</p>\n\n')
+
+    elif len(st.session_state.df_horario_esp_ultimo_hotel)>0:
+
+        html = definir_html_2(st.session_state.df_horario_esp_ultimo_hotel)
+    
+        with open(nome_html, "w", encoding="utf-8") as file:
+
+            nome_regiao = nome_html.split()[2]
+
+            nome_regiao = nome_regiao.replace('.html', '')
+
+            file.write(f'<p style="font-size:50px;">{nome_regiao} | {st.session_state.data_roteiro}</p>\n\n')
+    
+            file.write(f'<p style="font-size:40px;">Antecipações Específicas</p>')
+            
+            file.write(html)
+
+        with open(nome_html, "a", encoding="utf-8") as file:
+
+            nome_regiao = nome_html.split()[2]
+
+            nome_regiao = nome_regiao.replace('.html', '')
+
+            file.write(f'<p style="font-size:50px;">{nome_regiao}</p>\n\n')
 
             file.write(f'<p style="font-size:40px;">Roteiros</p>\n\n')
 
@@ -2963,19 +3009,9 @@ def criar_output_html(nome_html, html):
 
             nome_regiao = nome_regiao.replace('.html', '')
 
-            file.write(f'<p style="font-size:50px;">{nome_regiao}</p>\n\n')
+            file.write(f'<p style="font-size:50px;">{nome_regiao} | {st.session_state.data_roteiro}</p>\n\n')
 
             file.write(f'<p style="font-size:40px;">Roteiros</p>\n\n')
-
-    if len(st.session_state.df_horario_esp_ultimo_hotel)>0:
-
-        html = definir_html_2(st.session_state.df_horario_esp_ultimo_hotel)
-
-        with open(nome_html, "a", encoding="utf-8") as file:
-
-            file.write(f'<p style="font-size:40px;">Antecipações Específicas</p>')
-            
-            file.write(html)
 
 def inserir_html_2(nome_html, df):
 
@@ -4981,10 +5017,16 @@ if roteirizar:
     row3 = st.columns(3)
 
     coluna = 0
+    
+    hora_execucao = datetime.now()
+    
+    hora_execucao_menos_3h = hora_execucao - timedelta(hours=3)
 
     hora_execucao = datetime.now().strftime("%d-%m-%Y %Hh%Mm")
 
     st.session_state.nome_html = f"{hora_execucao} {nome_html_ref}.html"
+
+    st.session_state.data_roteiro = data_roteiro.strftime("%d/%m/%Y")
 
     st.session_state.df_hoteis_pax_max = df_hoteis_pax_max
 
