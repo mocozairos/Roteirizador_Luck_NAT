@@ -10,19 +10,24 @@ from google.oauth2 import service_account
 import gspread 
 import webbrowser
 
-def gerar_df_phoenix(vw_name):
+def gerar_df_phoenix(vw_name, base_luck):
+
+    data_hoje = datetime.now()
+
+    data_hoje_str = data_hoje.strftime("%Y-%m-%d")
+
     # Parametros de Login AWS
     config = {
     'user': 'user_automation_jpa',
     'password': 'luck_jpa_2024',
     'host': 'comeia.cixat7j68g0n.us-east-1.rds.amazonaws.com',
-    'database': 'test_phoenix_natal'
+    'database': base_luck
     }
     # Conexão as Views
     conexao = mysql.connector.connect(**config)
     cursor = conexao.cursor()
 
-    request_name = f'SELECT * FROM {vw_name}'
+    request_name = f'SELECT * FROM {vw_name} WHERE {vw_name}.`Data Execucao`>={data_hoje_str}'
 
     # Script MySql para requests
     cursor.execute(
@@ -3121,6 +3126,8 @@ def verificar_rotas_alternativas_ou_plotar_roteiros(df_roteiros_alternativos, ro
                            ignore_index=True)
         
         df_pdf_2 = df_pdf[['Reserva', 'Data Horario Apresentacao']].sort_values(by='Reserva').reset_index(drop=True)
+
+        st.session_state.df_insercao = df_pdf[['Id_Reserva', 'Id_Servico', 'Data Horario Apresentacao', 'Data Horario Apresentacao Original']].reset_index(drop=True)
         
         for index in range(len(df_pdf)):
 
@@ -4286,54 +4293,130 @@ def inserir_coluna_horario_ultimo_hotel(df_router_filtrado_2):
 
     return df_router_filtrado_2
 
+def atualizar_banco_dados(df_exportacao, base_luck):
+
+    config = {
+    'user': 'user_automation',
+    'password': 'auto_luck_2024',
+    'host': 'comeia.cixat7j68g0n.us-east-1.rds.amazonaws.com',
+    'database': base_luck
+    }
+    # Conexão ao banco de dados
+    conexao = mysql.connector.connect(**config)
+    cursor = conexao.cursor()
+    
+    # Coluna para armazenar o status da atualização
+    df_exportacao['Status Serviço'] = ''
+    df_exportacao['Status Auditoria'] = ''
+    
+    # Placeholder para exibir o DataFrame e atualizar em tempo real
+    placeholder = st.empty()
+    for idx, row in df_exportacao.iterrows():
+        id_reserva = row['Id_Reserva']
+        id_servico = row['Id_Servico']
+        currentPresentationHour = str(row['Data Horario Apresentacao Original'])
+        newPresentationHour = str(row['Data Horario Apresentacao'])
+        
+        data = '{"presentation_hour":["' + currentPresentationHour + '","' + newPresentationHour + ' Roteirizador"]}'
+        
+        #Horário atual em string
+
+        hora_execucao = datetime.now()
+    
+        hora_execucao_menos_3h = hora_execucao - timedelta(hours=3)
+
+        current_timestamp = int(hora_execucao_menos_3h.timestamp())
+        
+        try:
+            # Atualizar o banco de dados se o ID já existir
+            query = "UPDATE reserve_service SET presentation_hour = %s WHERE id = %s"
+            cursor.execute(query, (newPresentationHour, id_servico))
+            conexao.commit()
+            df_exportacao.at[idx, 'Status Serviço'] = 'Atualizado com sucesso'
+            
+        except Exception as e:
+            df_exportacao.at[idx, 'Status Serviço'] = f'Erro: {e}'
+        
+        try:
+            # Adicionar registro de edição na tabela de auditoria
+            query = "INSERT INTO changelogs (relatedObjectType, relatedObjectId, parentId, data, createdAt, type, userId, module, hostname) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, null)"
+            cursor.execute(query, ('ReserveService', id_servico, id_reserva, data, current_timestamp, 'update', st.query_params["userId"], 'router'))
+            conexao.commit()
+            df_exportacao.at[idx, 'Status Auditoria'] = 'Atualizado com sucesso'
+        except Exception as e:
+            df_exportacao.at[idx, 'Status Auditoria'] = f'Erro: {e}'
+            
+        # Define o estilo para coloração condicional
+        styled_df = df_exportacao.style.applymap(
+            lambda val: 'background-color: green; color: white' if val == 'Atualizado com sucesso' 
+            else ('background-color: red; color: white' if val != '' else ''),
+            subset=['Status Serviço', 'Status Auditoria']
+        )
+        
+        # Atualiza o DataFrame na interface em tempo real
+        placeholder.dataframe(styled_df, hide_index=True, use_container_width=True)
+        # time.sleep(0.5)
+    
+    cursor.close()
+    conexao.close()
+    return df_exportacao
+
+def getUser(userId, base_luck):
+
+    config = {
+    'user': 'user_automation',
+    'password': 'auto_luck_2024',
+    'host': 'comeia.cixat7j68g0n.us-east-1.rds.amazonaws.com',
+    'database': base_luck
+    }
+
+    # Cria uma cópia do config e sobrescreve o campo database
+    config_general = config.copy()
+    config_general['database'] = 'test_phoenix_general'
+    
+    # Conexão às Views usando o config modificado
+    conexao = mysql.connector.connect(**config_general)
+    cursor = conexao.cursor()
+
+    request_name = f'SELECT * FROM user WHERE ID = {userId}'
+
+    # Script MySQL para requests
+    cursor.execute(request_name)
+    # Coloca o request em uma variavel
+    resultado = cursor.fetchall()
+    # Busca apenas os cabeçalhos do Banco
+    cabecalho = [desc[0] for desc in cursor.description]
+
+    # Fecha a conexão
+    cursor.close()
+    conexao.close()
+
+    # Coloca em um dataframe e converte decimal para float
+    df = pd.DataFrame(resultado, columns=cabecalho)
+    df = df.applymap(lambda x: float(x) if isinstance(x, decimal.Decimal) else x)
+    return df
+
 st.set_page_config(layout='wide')
 
-st.title('Roteirizador de Transfer Out - Natal')
+# Verificando se o link está com ID do usuário
 
-st.divider()
+if not st.query_params or not st.query_params["userId"]:
 
-# Objetos p/ escolher Jarbas ou Gerald
+    st.error("Usuário não autenticado")
 
-st.header('Robô')
+    st.stop()
 
-st.markdown('*se nenhum robô for escolhido, o padrão é roteirizar com Jarbas*')
+# Carrega os dados da tabela 'user`
 
-row0 = st.columns(2)
-
-with row0[0]:
-
-    robo_usado = st.radio('Escolha o robô para roteirizar', ['Jarbas', 'Gerald'], index=None)
-
-    if robo_usado=='Gerald':
-
-        pax_max_gerald = st.number_input('Máximo de Paxs por Carro', step=1, value=30, key='pax_max_gerald')
-
-    container_jarbas = st.container(border=True)
-
-    container_jarbas.subheader('Jarbas')
-
-    container_jarbas.write('Jarbas vai gerar os roteiros priorizando apenas a sequência de hoteis. ' + \
-                           'Mais indicado pra quando não existe limitação de carros na frota.')
-
-with row0[1]:
-
-    container_gerald = st.container(border=True)
-
-    container_gerald.subheader('Gerald')
-
-    container_gerald.write('Gerald, vai gerar os roteiros tentando otimizar as rotas em carros maiores.' + 
-                           ' Se lotar carros com uma determinada capacidade for de boa utilidade, melhor usar Gerald. E se o usar,' + 
-                           ' precisa informar qual a capacidade máxima do veículo que ele deve tentar lotar quando roteirizar.')
-
-st.divider()
-
-st.header('Parâmetros')
+if not 'df_user' in st.session_state:
+    
+    st.session_state.df_user = getUser(st.query_params["userId"], 'test_phoenix_natal')
 
 # Puxando dados do phoenix
 
 if not 'df_router' in st.session_state:
 
-    st.session_state.df_router = gerar_df_phoenix('vw_router')
+    st.session_state.df_router = gerar_df_phoenix('vw_router', 'test_phoenix_natal')
 
     dict_nomes_servicos = {'OUT Touros - hotéis Parceiros': 'OUT - Touros', 'OUT Natal - Hotéis Parceiros ': 'OUT - Natal', 
                             'OUT Pipa - Hotéis Parceiros': 'OUT - Pipa', 'Black - OUT Natal': 'OUT - Natal'}
@@ -4345,23 +4428,15 @@ if not 'df_router' in st.session_state:
                                                             (st.session_state.df_router['Status da Reserva']!='PENDENCIA DE IMPORTAÇÃO') & 
                                                             ~(pd.isna(st.session_state.df_router['Status da Reserva']))]\
         .reset_index(drop=True)
+    
+    st.session_state.df_router['Data Horario Apresentacao Original'] = st.session_state.df_router['Data Horario Apresentacao']
 
-# Puxando dados de hoteis das planilhas
 
-if not 'df_natal' in st.session_state:
+st.title('Roteirizador de Transfer Out - Natal')
 
-    puxar_sequencias_hoteis()
+st.divider()
 
-    st.session_state.dict_regioes_hoteis = \
-        {'OUT - Natal': ['df_natal', 'Natal', 'Hoteis Natal', 'Natal'], 
-         'OUT - Pipa': ['df_pipa', 'Pipa', 'Hoteis Pipa', 'Pipa'], 
-         'OUT - Touros': ['df_touros', 'Touros', 'Hoteis Touros', 'Touros'], 
-         'OUT - São Miguel Gostoso': ['df_sao_miguel', 'Sao Miguel', 'Hoteis Sao Miguel', 'São Miguel'], 
-         'Out - Galinhos': ['df_galinhos', 'Galinhos', 'Hoteis Galinhos', 'Galinhos'], 
-         'OUT - Camurupim': ['df_camurupim', 'Camurupim', 'Hoteis Camurupim', 'Camurupim'], 
-         'Out - Genipabu': ['df_genipabu', 'Genipabu', 'Hoteis Genipabu', 'Genipabu'], 
-         'OUT - Pirangi': ['df_pirangi', 'Pirangi', 'Hoteis Pirangi', 'Pirangi'], 
-         'OUT - Baia Formosa': ['df_baia_formosa', 'Baia Formosa', 'Hoteis Baia Formosa', 'Baia Formosa']}
+st.header('Parâmetros')
 
 row1 = st.columns(3)
 
@@ -4421,55 +4496,28 @@ row21 = st.columns(2)
 
 with row2[0]:
 
-    row2_1=st.columns(2)
+    atualizar_phoenix = st.button('Atualizar Dados Phoenix')
 
-    # Botão Atualizar Hoteis
+    if atualizar_phoenix:
 
-    with row2_1[0]:
+        st.session_state.df_router = gerar_df_phoenix('vw_router', 'test_phoenix_natal')
 
-        atualizar_hoteis = st.button('Atualizar Sequência de Hoteis')
+        dict_nomes_servicos = {'OUT Touros - hotéis Parceiros': 'OUT - Touros', 'OUT Natal - Hotéis Parceiros ': 'OUT - Natal', 
+                                'OUT Pipa - Hotéis Parceiros': 'OUT - Pipa', 'Black - OUT Natal': 'OUT - Natal'}
 
-        # Puxando sequência de hoteis
+        st.session_state.df_router['Servico'] = st.session_state.df_router['Servico'].replace(dict_nomes_servicos)
 
-        if atualizar_hoteis:
+        st.session_state.df_router = st.session_state.df_router[(st.session_state.df_router['Servico']!='OUT - Tripulacao') & 
+                                                        (st.session_state.df_router['Status da Reserva']!='RASCUNHO') & 
+                                                        (st.session_state.df_router['Status da Reserva']!='PENDENCIA DE IMPORTAÇÃO') & 
+                                                        ~(pd.isna(st.session_state.df_router['Status da Reserva']))]\
+            .reset_index(drop=True)
+        
+        st.session_state.df_router['Data Horario Apresentacao Original'] = st.session_state.df_router['Data Horario Apresentacao']
 
-            puxar_sequencias_hoteis()
-
-            st.session_state.dict_regioes_hoteis = \
-                {'OUT - Natal': ['df_natal', 'Natal', 'Hoteis Natal', 'Natal'], 
-                'OUT - Pipa': ['df_pipa', 'Pipa', 'Hoteis Pipa', 'Pipa'], 
-                'OUT - Touros': ['df_touros', 'Touros', 'Hoteis Touros', 'Touros'], 
-                'OUT - São Miguel Gostoso': ['df_sao_miguel', 'Sao Miguel', 'Hoteis Sao Miguel', 'São Miguel'], 
-                'Out - Galinhos': ['df_galinhos', 'Galinhos', 'Hoteis Galinhos', 'Galinhos'], 
-                'OUT - Camurupim': ['df_camurupim', 'Camurupim', 'Hoteis Camurupim', 'Camurupim'], 
-                'Out - Genipabu': ['df_genipabu', 'Genipabu', 'Hoteis Genipabu', 'Genipabu'], 
-                'OUT - Pirangi': ['df_pirangi', 'Pirangi', 'Hoteis Pirangi', 'Pirangi'], 
-                'OUT - Baia Formosa': ['df_baia_formosa', 'Baia Formosa', 'Hoteis Baia Formosa', 'Baia Formosa']}
-
-    # Botão Atualizar Dados Phoenix
-
-    with row2_1[1]:
-
-        atualizar_phoenix = st.button('Atualizar Dados Phoenix')
-
-        if atualizar_phoenix:
-
-            st.session_state.df_router = gerar_df_phoenix('vw_router')
-
-            dict_nomes_servicos = {'OUT Touros - hotéis Parceiros': 'OUT - Touros', 'OUT Natal - Hotéis Parceiros ': 'OUT - Natal', 
-                                    'OUT Pipa - Hotéis Parceiros': 'OUT - Pipa', 'Black - OUT Natal': 'OUT - Natal'}
-
-            st.session_state.df_router['Servico'] = st.session_state.df_router['Servico'].replace(dict_nomes_servicos)
-
-            st.session_state.df_router = st.session_state.df_router[(st.session_state.df_router['Servico']!='OUT - Tripulacao') & 
-                                                            (st.session_state.df_router['Status da Reserva']!='RASCUNHO') & 
-                                                            (st.session_state.df_router['Status da Reserva']!='PENDENCIA DE IMPORTAÇÃO') & 
-                                                            ~(pd.isna(st.session_state.df_router['Status da Reserva']))]\
-                .reset_index(drop=True)
-
-            if 'df_servico_voos_horarios' in st.session_state:
-                
-                st.session_state['df_servico_voos_horarios'] = pd.DataFrame(columns=['Servico', 'Voo', 'Horario Voo'])
+        if 'df_servico_voos_horarios' in st.session_state:
+            
+            st.session_state['df_servico_voos_horarios'] = pd.DataFrame(columns=['Servico', 'Voo', 'Horario Voo'])
 
     # Campo de data
 
@@ -4798,6 +4846,19 @@ if servico_roteiro and 'df_horario_esp_ultimo_hotel' in st.session_state:
 
 if roteirizar:
 
+    puxar_sequencias_hoteis()
+
+    st.session_state.dict_regioes_hoteis = \
+        {'OUT - Natal': ['df_natal', 'Natal', 'Hoteis Natal', 'Natal'], 
+         'OUT - Pipa': ['df_pipa', 'Pipa', 'Hoteis Pipa', 'Pipa'], 
+         'OUT - Touros': ['df_touros', 'Touros', 'Hoteis Touros', 'Touros'], 
+         'OUT - São Miguel Gostoso': ['df_sao_miguel', 'Sao Miguel', 'Hoteis Sao Miguel', 'São Miguel'], 
+         'Out - Galinhos': ['df_galinhos', 'Galinhos', 'Hoteis Galinhos', 'Galinhos'], 
+         'OUT - Camurupim': ['df_camurupim', 'Camurupim', 'Hoteis Camurupim', 'Camurupim'], 
+         'Out - Genipabu': ['df_genipabu', 'Genipabu', 'Hoteis Genipabu', 'Genipabu'], 
+         'OUT - Pirangi': ['df_pirangi', 'Pirangi', 'Hoteis Pirangi', 'Pirangi'], 
+         'OUT - Baia Formosa': ['df_baia_formosa', 'Baia Formosa', 'Hoteis Baia Formosa', 'Baia Formosa']}
+
     nome_df_hotel = st.session_state.dict_regioes_hoteis[servico_roteiro][0]
 
     nome_html_ref = st.session_state.dict_regioes_hoteis[servico_roteiro][1]
@@ -4874,15 +4935,6 @@ if roteirizar:
         df_juncoes_pax_max = pd.DataFrame()
 
         df_voos_pax_max = pd.DataFrame()
-
-        # Roteirizando com gerald os carros maiores especificados
-
-        if robo_usado=='Gerald':
-
-            df_router_filtrado_2, roteiro, df_juncoes_pax_max, df_voos_pax_max = \
-                roteirizar_voo_juncao_mais_pax_max(df_router_filtrado_2, roteiro, max_hoteis, pax_max_gerald, 
-                                                   df_hoteis_ref, intervalo_hoteis_bairros_iguais, intervalo_hoteis_bairros_diferentes, 
-                                                   df_juncoes_pax_max, df_voos_pax_max) 
 
         # Gerando horários de apresentação
 
@@ -5250,6 +5302,8 @@ if 'nome_html' in st.session_state and len(st.session_state.df_roteiros_alternat
 
                 df_pdf_apoios = pd.concat([df_roteiros_apoios, df_roteiros_apoios_alternativos], ignore_index=True)
 
+                st.session_state.df_insercao = df_pdf[['Id_Reserva', 'Id_Servico', 'Data Horario Apresentacao', 'Data Horario Apresentacao Original']].reset_index(drop=True)
+
                 df_pdf_2 = df_pdf[['Reserva', 'Data Horario Apresentacao']].sort_values(by='Reserva').reset_index(drop=True)
                 
                 for index in range(len(df_pdf)):
@@ -5282,3 +5336,13 @@ if 'nome_html' in st.session_state and len(st.session_state.df_roteiros_alternat
                     file_name=st.session_state.nome_html,
                     mime="text/html"
                 )
+
+if 'df_insercao' in st.session_state and len(st.session_state.df_insercao)>0:
+
+    lancar_horarios = st.button('Lançar Horários')
+
+    if lancar_horarios:
+
+        df_insercao = atualizar_banco_dados(st.session_state.df_insercao, 'test_phoenix_natal')
+
+        st.session_state.df_insercao = st.session_state.df_insercao.drop(st.session_state.df_insercao.index)
