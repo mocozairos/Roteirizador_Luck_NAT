@@ -4434,8 +4434,6 @@ if not 'df_router' in st.session_state:
 
 st.title('Roteirizador de Transfer Out - Natal')
 
-st.title('Roteirizador de Transfer Out - Natal')
-
 st.divider()
 
 st.header('Parâmetros')
