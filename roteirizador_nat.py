@@ -3124,6 +3124,8 @@ def verificar_rotas_alternativas_ou_plotar_roteiros(df_roteiros_alternativos, ro
 
         df_pdf = pd.concat([df_router_filtrado_2, df_hoteis_pax_max, df_juncoes_pax_max, df_voos_pax_max], 
                            ignore_index=True)
+
+        df_pdf
         
         df_pdf_2 = df_pdf[['Reserva', 'Data Horario Apresentacao']].sort_values(by='Reserva').reset_index(drop=True)
 
@@ -5301,8 +5303,6 @@ if 'nome_html' in st.session_state and len(st.session_state.df_roteiros_alternat
                                     df_roteiros_alternativos], ignore_index=True)
 
                 df_pdf_apoios = pd.concat([df_roteiros_apoios, df_roteiros_apoios_alternativos], ignore_index=True)
-
-                df_pdf
 
                 st.session_state.df_insercao = df_pdf[['Id_Reserva', 'Id_Servico', 'Data Horario Apresentacao', 'Data Horario Apresentacao Original']].reset_index(drop=True)
 
