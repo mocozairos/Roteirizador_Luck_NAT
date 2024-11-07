@@ -4425,6 +4425,7 @@ if not 'df_router' in st.session_state:
 
     st.session_state.df_router = st.session_state.df_router[(st.session_state.df_router['Servico']!='OUT - Tripulacao') & 
                                                             (st.session_state.df_router['Status da Reserva']!='RASCUNHO') & 
+                                                            (st.session_state.df_router['Status da Reserva']!='CANCELADO') & 
                                                             (st.session_state.df_router['Status da Reserva']!='PENDENCIA DE IMPORTAÇÃO') & 
                                                             ~(pd.isna(st.session_state.df_router['Status da Reserva']))]\
         .reset_index(drop=True)
@@ -4508,10 +4509,11 @@ with row2[0]:
         st.session_state.df_router['Servico'] = st.session_state.df_router['Servico'].replace(dict_nomes_servicos)
 
         st.session_state.df_router = st.session_state.df_router[(st.session_state.df_router['Servico']!='OUT - Tripulacao') & 
-                                                        (st.session_state.df_router['Status da Reserva']!='RASCUNHO') & 
-                                                        (st.session_state.df_router['Status da Reserva']!='PENDENCIA DE IMPORTAÇÃO') & 
-                                                        ~(pd.isna(st.session_state.df_router['Status da Reserva']))]\
-            .reset_index(drop=True)
+                                                            (st.session_state.df_router['Status da Reserva']!='RASCUNHO') & 
+                                                            (st.session_state.df_router['Status da Reserva']!='CANCELADO') & 
+                                                            (st.session_state.df_router['Status da Reserva']!='PENDENCIA DE IMPORTAÇÃO') & 
+                                                            ~(pd.isna(st.session_state.df_router['Status da Reserva']))]\
+        .reset_index(drop=True)
         
         st.session_state.df_router['Data Horario Apresentacao Original'] = st.session_state.df_router['Data Horario Apresentacao']
 
