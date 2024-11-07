@@ -4527,7 +4527,8 @@ with row2[0]:
 
     df_router_data_roteiro = st.session_state.df_router[(st.session_state.df_router['Data Execucao']==data_roteiro) & 
                                                         (st.session_state.df_router['Tipo de Servico']=='OUT') & 
-                                                        (st.session_state.df_router['Status do Servico']!='CANCELADO')]\
+                                                        (st.session_state.df_router['Status do Servico']!='CANCELADO') & 
+                                                        (st.session_state.df_router['Status da Reserva']!='CANCELADO')]\
                                                             .reset_index(drop=True)
 
     lista_servicos = df_router_data_roteiro['Servico'].unique().tolist()
