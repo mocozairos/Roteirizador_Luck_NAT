@@ -61,7 +61,7 @@ def objeto_intervalo(titulo, valor_padrao, chave):
 
     return intervalo_ref
 
-def puxar_sequencias_hoteis():
+def puxar_sequencias_hoteis(id_gsheet, lista_abas, lista_nomes_df_hoteis):
 
     nome_credencial = st.secrets["CREDENCIAL_SHEETS"]
     credentials = service_account.Credentials.from_service_account_info(nome_credencial)
@@ -69,19 +69,13 @@ def puxar_sequencias_hoteis():
     credentials = credentials.with_scopes(scope)
     client = gspread.authorize(credentials)
 
-    # Abrir a planilha desejada pelo seu ID
-    spreadsheet = client.open_by_key('1ch1NfOKeK008ZeqexQTzOqXuCZ2Q6sL8hY2sPqQegLQ')
-
-    lista_abas = ['Hoteis Natal', 'Hoteis Pipa', 'Hoteis Touros', 'Hoteis Sao Miguel', 'Hoteis Galinhos', 'Hoteis Camurupim', 'Hoteis Genipabu', 'Hoteis Pirangi', 
-                  'Hoteis Baia Formosa']
-
-    lista_df_hoteis = ['df_natal', 'df_pipa', 'df_touros', 'df_sao_miguel', 'df_galinhos', 'df_camurupim', 'df_genipabu', 'df_pirangi', 'df_baia_formosa']
+    spreadsheet = client.open_by_key(id_gsheet)
 
     for index in range(len(lista_abas)):
 
         aba = lista_abas[index]
 
-        df_hotel = lista_df_hoteis[index]
+        df_hotel = lista_nomes_df_hoteis[index]
         
         sheet = spreadsheet.worksheet(aba)
 
@@ -106,6 +100,14 @@ def puxar_sequencias_hoteis():
 
         st.session_state[df_hotel]['Micro'] = \
         st.session_state[df_hotel]['Micro'].apply(lambda x: None if pd.isna(x) or str(x).strip() == '' else x)
+
+        st.session_state[df_hotel]['Van'] = \
+        st.session_state[df_hotel]['Van'].apply(lambda x: None if pd.isna(x) or str(x).strip() == '' else x)
+
+        st.session_state[df_hotel]['Utilitario'] = \
+        st.session_state[df_hotel]['Utilitario'].apply(lambda x: None if pd.isna(x) or str(x).strip() == '' else x)
+
+        st.session_state[df_hotel]['Sequência'] = pd.to_numeric(st.session_state[df_hotel]['Sequência'], errors='coerce')
 
 def gerar_itens_faltantes(df_servicos, df_hoteis):
 
@@ -4849,7 +4851,10 @@ if servico_roteiro and 'df_horario_esp_ultimo_hotel' in st.session_state:
 
 if roteirizar:
 
-    puxar_sequencias_hoteis()
+    puxar_sequencias_hoteis('1ch1NfOKeK008ZeqexQTzOqXuCZ2Q6sL8hY2sPqQegLQ', 
+                            ['Hoteis Natal', 'Hoteis Pipa', 'Hoteis Touros', 'Hoteis Sao Miguel', 'Hoteis Galinhos', 'Hoteis Camurupim', 'Hoteis Genipabu', 
+                             'Hoteis Pirangi', 'Hoteis Baia Formosa'], 
+                             ['df_natal', 'df_pipa', 'df_touros', 'df_sao_miguel', 'df_galinhos', 'df_camurupim', 'df_genipabu', 'df_pirangi', 'df_baia_formosa'])
 
     st.session_state.dict_regioes_hoteis = \
         {'OUT - Natal': ['df_natal', 'Natal', 'Hoteis Natal', 'Natal'], 
