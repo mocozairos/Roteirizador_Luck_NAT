@@ -7,6 +7,7 @@ from itertools import combinations
 from collections import Counter
 from google.oauth2 import service_account
 import gspread 
+import requests
 
 def gerar_df_phoenix(vw_name, base_luck):
     
@@ -5542,3 +5543,45 @@ if 'df_insercao' in st.session_state and len(st.session_state.df_insercao)>0:
         df_insercao = atualizar_banco_dados(st.session_state.df_insercao, 'test_phoenix_natal')
 
         st.rerun()
+
+if servico_roteiro and data_roteiro:
+
+    if servico_roteiro!='OUT - Natal':
+
+        df_ref_thiago = st.session_state.df_router[(st.session_state.df_router['Data Execucao']==data_roteiro) & 
+                                                        (st.session_state.df_router['Tipo de Servico']=='OUT') &  
+                                                        (st.session_state.df_router['Status do Servico']!='CANCELADO') & 
+                                                        (st.session_state.df_router['Servico']==servico_roteiro) & 
+                                                        ~(st.session_state.df_router['Voo'].isin(voos_nao_operantes))].reset_index(drop=True)
+        
+    else:
+
+        df_ref_thiago = st.session_state.df_router[(st.session_state.df_router['Data Execucao']==data_roteiro) & 
+                                                        (st.session_state.df_router['Tipo de Servico']=='OUT') &  
+                                                        (st.session_state.df_router['Status do Servico']!='CANCELADO') & 
+                                                        ((st.session_state.df_router['Servico']==servico_roteiro) | 
+                                                         (st.session_state.df_router['Servico']=='OUT - Camurupim')) & 
+                                                        ~(st.session_state.df_router['Voo'].isin(voos_nao_operantes))].reset_index(drop=True)
+        
+    df_ref_thiago = df_ref_thiago[~df_ref_thiago['Observacao'].str.upper().str.contains('CLD', na=False)]
+
+    if len(df_ref_thiago)>0:
+
+        lista_ids_servicos = df_ref_thiago['Id_Servico'].tolist()
+
+        webhook_thiago = "https://conexao.multiatend.com.br/webhook-test/luckenvioinformativo"
+        
+        enviar_informes = st.button(f'Enviar Informativos de Saída - {servico_roteiro} | {data_roteiro.strftime("%d/%m/%Y")}')
+        
+        data_roteiro_str = data_roteiro.strftime('%Y-%m-%d')
+        
+        payload = {"data": data_roteiro_str, 
+                   "ids_servicos": lista_ids_servicos}
+        
+        if enviar_informes:
+            response = requests.post(webhook_thiago, json=payload)
+            
+            if response.status_code == 200:
+                    st.success(f"Informativos Enviados com Sucesso!")
+            else:
+                st.error(f"Erro. Favor contactar o suporte")
