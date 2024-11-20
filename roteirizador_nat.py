@@ -1772,8 +1772,6 @@ def gerar_roteiros_alternativos_4(df_servicos, max_hoteis):
 
     lista_roteiros_alternativos = df_servicos[df_servicos['Carros']==2]['Roteiro'].unique().tolist()
 
-    # Gerando roteiros alternativos
-
     for item in lista_roteiros_alternativos:
 
         df_ref = df_servicos[df_servicos['Roteiro']==item].reset_index(drop=True)
