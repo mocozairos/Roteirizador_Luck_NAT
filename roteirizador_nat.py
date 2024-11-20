@@ -4511,7 +4511,6 @@ def gerar_roteiros_alternativos_5(df_servicos, pax_max_utilitario, pax_max_van, 
 
                     current_sum = df_ref_group_hotel.loc[list(comb), 'Total ADT | CHD'].sum()
                     
-                    # Se for igual ao target, já encontramos a combinação perfeita
                     if current_sum == target:
                         closest_sum = current_sum
                         closest_indices = list(comb)
