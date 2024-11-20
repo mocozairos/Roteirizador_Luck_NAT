@@ -4255,6 +4255,8 @@ def inserir_coluna_horario_ultimo_hotel(df_router_filtrado_2):
 
 def atualizar_banco_dados(df_exportacao, base_luck):
 
+    st.session_state.df_insercao = st.session_state.df_insercao.drop(st.session_state.df_insercao.index)
+
     config = {
     'user': 'user_automation',
     'password': 'auto_luck_2024',
@@ -5539,4 +5541,4 @@ if 'df_insercao' in st.session_state and len(st.session_state.df_insercao)>0:
 
         df_insercao = atualizar_banco_dados(st.session_state.df_insercao, 'test_phoenix_natal')
 
-        st.session_state.df_insercao = st.session_state.df_insercao.drop(st.session_state.df_insercao.index)
+        st.rerun()
