@@ -2038,7 +2038,7 @@ def identificar_apoios_em_df_4(df_servicos, pax_max_utilitario, pax_max_van, pax
         
         df_ref_4_group_hoteis = df_ref_4.groupby('Est Origem').agg({'Total ADT | CHD': 'sum', 'Apoios': 'first'}).reset_index()
 
-        df_ref_4_group_hoteis = df_ref_4_group_hoteis[(df_ref_4_group_hoteis['Total ADT | CHD']<=4) | 
+        df_ref_4_group_hoteis = df_ref_4_group_hoteis[(df_ref_4_group_hoteis['Total ADT | CHD']<=pax_max_utilitario) | 
                                                       (df_ref_4_group_hoteis['Apoios']!='')].reset_index(drop=True)
         
         lista_hoteis_apoio_4 = df_ref_4_group_hoteis['Est Origem'].unique().tolist()
@@ -2096,7 +2096,7 @@ def identificar_apoios_em_df_4(df_servicos, pax_max_utilitario, pax_max_van, pax
 
                         hoteis_total_apoio+=1
 
-                        if paxs_total_apoio+paxs_hotel<=18:
+                        if paxs_total_apoio+paxs_hotel<=pax_max_van:
 
                             paxs_total_apoio+=paxs_hotel
 
@@ -2128,7 +2128,7 @@ def identificar_apoios_em_df_4(df_servicos, pax_max_utilitario, pax_max_van, pax
 
                             verificador_n_hoteis = hoteis_total_apoio
 
-                        if verificador_n_hoteis<=max_hoteis and paxs_total_apoio+paxs_hotel<=18:
+                        if verificador_n_hoteis<=max_hoteis and paxs_total_apoio+paxs_hotel<=pax_max_van:
 
                             if not ((df_ref_5.at[index, 'Hoteis Juntos p/ Apoios']==df_ref_5.at[index-1, 'Hoteis Juntos p/ Apoios']) and 
                                     (~pd.isna(df_ref_5.at[index, 'Hoteis Juntos p/ Apoios']))):
