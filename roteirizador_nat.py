@@ -5271,7 +5271,8 @@ if roteirizar:
 
 # Gerar roteiros finais
 
-if 'nome_html' in st.session_state and len(st.session_state.df_roteiros_alternativos)>0:
+if 'nome_html' in st.session_state and (len(st.session_state.df_roteiros_alternativos)>0 or len(st.session_state.df_roteiros_alternativos_2)>0 or len(st.session_state.df_roteiros_alternativos_3)>0 or \
+        len(st.session_state.df_roteiros_alternativos_4)>0 or len(st.session_state.df_roteiros_alternativos_5)>0):
 
     st.divider()
 
