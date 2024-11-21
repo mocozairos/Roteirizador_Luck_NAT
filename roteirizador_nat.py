@@ -5163,7 +5163,7 @@ if roteirizar:
 
     # Gerando rotas de apoios de rotas alternativas 4
 
-    df_roteiros_alternativos_5 = identificar_apoios_em_df_4(df_roteiros_alternativos_5, pax_max_utilitario, pax_max_van, pax_max_micro)
+    df_roteiros_alternativos_5 = identificar_apoios_em_df(df_roteiros_alternativos_5, pax_max_utilitario, pax_max_van, pax_max_micro)
 
     # Gerando rotas de apoios de rotas alternativas 4
 
