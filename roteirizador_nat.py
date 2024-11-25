@@ -4160,6 +4160,42 @@ def roteirizar_natal_apenas_primeiros_hoteis(df_router_filtrado_2, sequencia_mar
 
     return df_router_filtrado_2
 
+def roteirizar_natal_maioria_praia_dos_artistas(df_router_filtrado_2):
+
+    if len(df_router_filtrado_2)>0:
+
+        df_roteiro_carro = df_router_filtrado_2[['Roteiro', 'Carros']].drop_duplicates().reset_index(drop=True)
+
+        for index in range(len(df_roteiro_carro)):
+
+            roteiro_ref = df_roteiro_carro.at[index, 'Roteiro']
+
+            carro_ref = df_roteiro_carro.at[index, 'Carros']
+
+            df_ref = df_router_filtrado_2[(df_router_filtrado_2['Roteiro']==roteiro_ref) & (df_router_filtrado_2['Carros']==carro_ref)].reset_index()
+
+            paxs_praia_dos_artistas = df_ref[df_ref['Região']=='PRAIA DOS ARTISTAS']['Total ADT | CHD'].sum()
+
+            paxs_total = df_ref['Total ADT | CHD'].sum()
+
+            razao_ref = paxs_praia_dos_artistas / paxs_total
+
+            if razao_ref>0.5 and len(df_ref['Est Origem'].unique().tolist())>1:
+
+                df_ref = df_ref.drop(columns='Sequência')
+
+                df_ref = pd.merge(df_ref, st.session_state.df_ln[['Est Origem', 'Sequência']], on='Est Origem', how='left')
+
+                df_ref_ordenado = df_ref.sort_values(by='Sequência', ascending=False).reset_index(drop=True)
+
+                df_ref_ordenado = gerar_horarios_apresentacao_2(df_ref_ordenado)
+
+                for index_2, value in df_ref_ordenado['index'].items():
+
+                    df_router_filtrado_2.at[value, 'Data Horario Apresentacao']=df_ref_ordenado.at[index_2, 'Data Horario Apresentacao']
+
+    return df_router_filtrado_2
+
 def roteirizar_pos_apoios(df_roteiros_apoios, df_router_filtrado_2):
 
     if len(df_roteiros_apoios)>0:
@@ -4960,8 +4996,8 @@ if roteirizar:
 
     puxar_sequencias_hoteis('1ch1NfOKeK008ZeqexQTzOqXuCZ2Q6sL8hY2sPqQegLQ', 
                             ['Hoteis Natal', 'Hoteis Pipa', 'Hoteis Touros', 'Hoteis Sao Miguel', 'Hoteis Galinhos', 'Hoteis Camurupim', 'Hoteis Genipabu', 
-                             'Hoteis Pirangi', 'Hoteis Baia Formosa'], 
-                             ['df_natal', 'df_pipa', 'df_touros', 'df_sao_miguel', 'df_galinhos', 'df_camurupim', 'df_genipabu', 'df_pirangi', 'df_baia_formosa'])
+                             'Hoteis Pirangi', 'Hoteis Baia Formosa', 'Hoteis Passeio Litoral Norte'], 
+                             ['df_natal', 'df_pipa', 'df_touros', 'df_sao_miguel', 'df_galinhos', 'df_camurupim', 'df_genipabu', 'df_pirangi', 'df_baia_formosa', 'df_ln'])
 
     st.session_state.dict_regioes_hoteis = \
         {'OUT - Natal': ['df_natal', 'Natal', 'Hoteis Natal', 'Natal'], 
@@ -5026,13 +5062,15 @@ if roteirizar:
  
     itens_faltantes, lista_hoteis_df_router = gerar_itens_faltantes(df_router_filtrado, df_hoteis_ref)
 
+    itens_faltantes_passeios, lista_hoteis_df_router_passeios = gerar_itens_faltantes(df_router_filtrado, st.session_state.df_ln)
+
     pax_max_utilitario = 4
 
     pax_max_van = 18
 
     pax_max_micro = 25
 
-    if len(itens_faltantes)==0:
+    if (servico_roteiro=='OUT - Natal' and len(itens_faltantes)==0 and len(itens_faltantes_passeios)==0) or (servico_roteiro!='OUT - Natal' and len(itens_faltantes)==0):
 
         # Mensagens de andamento do script informando como foi a verificação dos hoteis cadastrados
 
@@ -5067,9 +5105,15 @@ if roteirizar:
 
         inserir_hoteis_faltantes(itens_faltantes, df_hoteis_ref, nome_aba_excel, nome_regiao)
 
+        if servico_roteiro=='OUT - Natal' and len(itens_faltantes_passeios)!=0:
+
+            inserir_hoteis_faltantes(itens_faltantes_passeios, st.session_state.df_ln, 'Hoteis Passeio Litoral Norte', 'Passeios Litoral Norte')
+
         st.stop()
 
     df_router_filtrado_2 = recalcular_horarios_menor_horario(df_router_filtrado_2)
+
+    df_router_filtrado_2 = roteirizar_natal_maioria_praia_dos_artistas(df_router_filtrado_2)
 
     # Identificando serviços das rotas primárias que vão precisar de apoios
 
@@ -5089,6 +5133,8 @@ if roteirizar:
 
     df_roteiros_alternativos = recalcular_horarios_menor_horario(df_roteiros_alternativos)
 
+    df_roteiros_alternativos = roteirizar_natal_maioria_praia_dos_artistas(df_roteiros_alternativos)
+
     # Gerando roteiros alternativos 2
 
     max_hoteis_2 = 10
@@ -5101,17 +5147,25 @@ if roteirizar:
 
     df_roteiros_alternativos_2 = recalcular_horarios_menor_horario(df_roteiros_alternativos_2)
 
+    df_roteiros_alternativos_2 = roteirizar_natal_maioria_praia_dos_artistas(df_roteiros_alternativos_2)
+
     df_roteiros_alternativos_3 = gerar_roteiros_alternativos_3(df_router_filtrado_2)
 
     df_roteiros_alternativos_3 = recalcular_horarios_menor_horario(df_roteiros_alternativos_3)
+
+    df_roteiros_alternativos_3 = roteirizar_natal_maioria_praia_dos_artistas(df_roteiros_alternativos_3)
 
     df_roteiros_alternativos_4 = gerar_roteiros_alternativos_4(df_router_filtrado_2, max_hoteis_4)
 
     df_roteiros_alternativos_4 = recalcular_horarios_menor_horario(df_roteiros_alternativos_4)
 
+    df_roteiros_alternativos_4 = roteirizar_natal_maioria_praia_dos_artistas(df_roteiros_alternativos_4)
+
     df_roteiros_alternativos_5 = gerar_roteiros_alternativos_5(df_router_filtrado_2, pax_max_utilitario, pax_max_van, pax_max_micro, max_hoteis_2)
 
     df_roteiros_alternativos_5 = recalcular_horarios_menor_horario(df_roteiros_alternativos_5)
+
+    df_roteiros_alternativos_5 = roteirizar_natal_maioria_praia_dos_artistas(df_roteiros_alternativos_5)
     
     # Identificando serviços das rotas alternativas que vão precisar de apoios
 
