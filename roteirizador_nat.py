@@ -5597,7 +5597,7 @@ if 'df_insercao' in st.session_state and len(st.session_state.df_insercao)>0:
 
         df_insercao = atualizar_banco_dados(st.session_state.df_insercao, 'test_phoenix_natal')
 
-        st.rerun()
+        # st.rerun()
 
 if servico_roteiro and data_roteiro:
 
