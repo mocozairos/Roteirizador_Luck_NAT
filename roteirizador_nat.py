@@ -5637,6 +5637,11 @@ if servico_roteiro and data_roteiro:
             response = requests.post(webhook_thiago, json=payload)
             
             if response.status_code == 200:
+                
                     st.success(f"Informativos Enviados com Sucesso!")
+                
             else:
+                
                 st.error(f"Erro. Favor contactar o suporte")
+
+                st.error(f"{response}")
