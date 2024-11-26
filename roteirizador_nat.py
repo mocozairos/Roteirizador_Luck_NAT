@@ -5624,7 +5624,7 @@ if servico_roteiro and data_roteiro:
 
         lista_ids_servicos = df_ref_thiago['Id_Servico'].tolist()
 
-        webhook_thiago = "https://conexao.multiatend.com.br/webhook/luckenvioinformativo"
+        webhook_thiago = "https://conexao.multiatend.com.br/webhook/luckenvioinformativonatal"
         
         enviar_informes = st.button(f'Enviar Informativos de Saída - {servico_roteiro} | {data_roteiro.strftime("%d/%m/%Y")}')
         
