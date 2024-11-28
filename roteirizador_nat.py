@@ -5620,6 +5620,17 @@ if servico_roteiro and data_roteiro:
         
     df_ref_thiago = df_ref_thiago[~df_ref_thiago['Observacao'].str.upper().str.contains('CLD', na=False)]
 
+    dict_tag_servico = \
+        {'OUT - Natal': 'Natal', 
+         'OUT - Pipa': 'Pipa', 
+         'OUT - Touros': 'Touros', 
+         'OUT - São Miguel Gostoso': 'São Miguel do Gostoso', 
+         'Out - Galinhos': 'Galinhos', 
+         'OUT - Camurupim': 'Camurupim', 
+         'Out - Genipabu': 'Genipabu', 
+         'OUT - Pirangi': 'Pirangi', 
+         'OUT - Baia Formosa': 'Baía Formosa'}
+
     if len(df_ref_thiago)>0:
 
         lista_ids_servicos = df_ref_thiago['Id_Servico'].tolist()
@@ -5631,7 +5642,8 @@ if servico_roteiro and data_roteiro:
         data_roteiro_str = data_roteiro.strftime('%Y-%m-%d')
         
         payload = {"data": data_roteiro_str, 
-                   "ids_servicos": lista_ids_servicos}
+                   "ids_servicos": lista_ids_servicos, 
+                   "tag_servico": dict_tag_servico[servico_roteiro]}
         
         if enviar_informes:
             response = requests.post(webhook_thiago, json=payload)
